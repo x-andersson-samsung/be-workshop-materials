@@ -5,3 +5,6 @@
 .obsidian/appearance.json
 .obsidian/graph.json
 .obsidian/workspace.json
+
+# Do not include exported slides
+export

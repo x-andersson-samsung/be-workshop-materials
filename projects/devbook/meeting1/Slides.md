@@ -1,17 +1,23 @@
 ---
 title: "Devbook "
-level:
+level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-01-26 13-56-37
+modified_at: 2026-01-30 17-09-14
 slideNumber: "true"
 ---
 
  %% Required for proper codeblock width %%
 <style>
 .reveal pre {
-  width: 110%; /* increase width */
+  width: 110%;
 }
+
+code {
+    font-size: 16px;
+    line-height: normal;
+}
+
 </style>
 
 %% Start of slides %%
@@ -52,7 +58,7 @@ Meetings will be split into:
 - Discussing homework
 - New theory
 - Practical exercise - building on project
-- Discussing new homework
+- Discussing next homework
 </grid>
 
 :::
@@ -62,6 +68,10 @@ Meetings will be split into:
 # Project
 
 --
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Description
+</grid>
 
 <grid drag="100 10" drop="0 0" align="left" >
 _**DevBook**_ is a simple app where developers can manage useful resources like articles, tutorials, tools, and libraries. 
@@ -105,7 +115,7 @@ Users can create resources with titles, URLs, descriptions, categories, and tags
 ### Syntax
 </grid>
 
-<grid drag="100 85" drop="0 10" align="left">
+<grid drag="50 85" drop="0 10" align="left">
 ```go []
 package main
 
@@ -117,9 +127,31 @@ func main() {
 	name := "World"
 	fmt.Printf("Hello %s!\n", name)
 }
-
 ```
 </grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Initialization
+</grid>
+
+<grid drag="50 85" drop="0 10" align="left">
+```go []
+var longVar int = 0
+shortVar := 0
+
+var (
+	manyVars1 = 0
+	manyVars2 = "hello"
+)
+
+const unchangechable = 0
+```
+</grid>
+
+---
+# Types
 
 --
 
@@ -160,7 +192,7 @@ Uninitialized values are given initial zero value depending on type:
 - 0 for numeric types,
 - false for the boolean type
 - "" (the empty string) for strings.
-- nil for pointers and pointer based types
+- nil for pointers and pointer based types (slices, maps)
 </grid>
 
 --
@@ -192,6 +224,7 @@ fmt.Println(a) // Will print "2"
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left">
+Structures are a collection of fields.
 ```go []
 type Point struct {
 	X int
@@ -200,6 +233,7 @@ type Point struct {
 
 v1 := Point{}
 v2 := Point{1,2}
+//v2 := Point{1} -- invalid, should 1 go to X or Y?
 v3 := Point{X: 5}
 ```
 </grid>
@@ -209,13 +243,14 @@ v3 := Point{X: 5}
 <grid drag="100 10" drop="0 0" align="left" >
 ### Arrays
 </grid>
-
+	
 <grid drag="100 85" drop="0 10" align="left">
+The type **[n]T** is an array of **n** values of type **T**.
 ```go []
-arr1 := [3]int{}              // [3]int{0,0,0}
-arr2 := [3]int{1,2,3}     // [3]int{1,2,3}
-arr3 := [4]int{1,2,3}     // [4]int{1,2,3,0}
-//arr4 := [2]int{1,2,3}  // error - too many values
+arr1 := [3]int{}				// [3]int{0,0,0}
+arr2 := [3]int{1,2,3}		// [3]int{1,2,3}
+arr3 := [4]int{1,2,3}		// [4]int{1,2,3,0}
+//arr4 := [2]int{1,2,3}	// error - too many values
 ```
 An array's length is part of its type, so arrays cannot be resized.
 </grid>
@@ -228,6 +263,8 @@ An array's length is part of its type, so arrays cannot be resized.
 
 <grid drag="100 85" drop="0 10" align="left">
 A slice is a dynamically-sized, flexible view into the elements of an array. 
+
+In simplified terms, it is a pointer to an array with length and capacity.
 ```go []
 // create a new array of size 5 and return slice on it
 slice := make([]int, 5) 
@@ -247,7 +284,6 @@ fmt.Println(numbers)
 note: Slice contains 3 values -> pointer to beginning, size, capacity
 
 --
-
 
 <grid drag="100 10" drop="0 0" align="left" >
 ### Slices 2
@@ -270,5 +306,112 @@ slice = append(slice, 2) // []int{0,0,0,1,2}
 slice = append(slice, 3)
 
 // []int{0,0,0,1,2,3}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Slices 3
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left">
+When building slices we can skip the bounds to use defaults
+
+```go []
+var a [10]int
+
+// For `a` these will be equivalent
+a[0:10]
+a[:10]
+a[0:]
+a[:]
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Maps
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left">
+A map maps keys to values. 
+
+```go []
+// Initialize 2 maps
+m := make(map[int]string)
+m2 := map[int]string{}
+
+// Add value
+m[1] = "Hello"
+
+// get values
+v := m[1]
+
+// checking if value exists
+v, ok := m[2] // Will return 0, false
+
+// deleting key
+delete(m, 1)
+```
+</grid>
+
+---
+
+# Flow control
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### If / else
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left">
+- Parentheses are optional
+- Brackets are required
+
+```go []
+if b {
+	fmt.Println("True")
+} else {
+	fmt.Println("False")
+}
+
+// We can also use if with "short statement". Following two checks are equivalent
+var m map[int]string
+_, ok := m[0]
+if ok {
+	// Do something
+}
+
+if v, ok := m[0]; ok {
+	// Do something
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Loops
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left">
+- Only one type of loops - **for**
+
+```go []
+// Long form - "init; condition; post"
+for i := 0; i < 10; i++ {
+	fmt.Println(i)
+}
+
+// Short form - "condition"
+for i < 10 {
+	fmt.Println(i)
+}
+
+
+
 ```
 </grid>
