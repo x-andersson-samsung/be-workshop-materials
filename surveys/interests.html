@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://unpkg.com/survey-core/survey-core.min.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/survey-core/survey.core.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/survey-js-ui/survey-js-ui.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/survey-core/themes/doubleborder-light.min.js"></script>
+
+    <script>
+        const SURVEY_ID = "interests"
+        const surveyJson = {
+            pages: [{
+                elements: [{
+                    name: "known",
+                    title: "How well do you know following concepts?",
+                    type: "matrix",
+                    alternateRows: true,
+                    columns: [{
+                        value: 1,
+                        text: "Not at all"
+                    }, {
+                        value: 2,
+                        text: "Basics"
+                    }, {
+                        value: 3,
+                        text: "Well"
+                    }, {
+                        value: 4,
+                        text: "Very well"
+                    }, {
+                        value: 5,
+                        text: "Expert"
+                    }],
+                    rows: [{
+                        value: "linux",
+                        text: "Linux",
+                    }, {
+                        value: "shell",
+                        text: "Shell (Bash, Fish)",
+                    }, {
+                        value: "git",
+                        text: "Git",
+                    }, {
+                        value: "docker",
+                        text: "Docker",
+                    }, {
+                        value: "sql_db",
+                        text: "SQL DB (any)",
+                    }, {
+                        value: "non_sql_db",
+                        text: "Non-SQL DB (any)",
+                    }, {
+                        value: "ci_cd_pipelines",
+                        text: "CI / CD pipelines",
+                    }, {
+                        value: "makefiles",
+                        text: "Makefiles (or alternatives)",
+                    }]
+                }]
+            }, {
+                elements: [{
+                    name: "interested",
+                    title: "Which of the following would you be interested in learning?",
+                    type: "matrix",
+                    alternateRows: true,
+                    columns: [{
+                        value: 1,
+                        text: "1 - Not at all"
+                    }, {
+                        value: 2,
+                        text: ""
+                    }, {
+                        value: 3,
+                        text: ""
+                    }, {
+                        value: 4,
+                        text: ""
+                    }, {
+                        value: 5,
+                        text: "5 - Very"
+                    }],
+                    rows: [{
+                        value: "go",
+                        text: "Go",
+                    }, {
+                        value: "git",
+                        text: "Git",
+                    }, {
+                        value: "docker",
+                        text: "Docker",
+                    }, {
+                        value: "sql_db",
+                        text: "SQL DB (Postgres)",
+                    }, {
+                        value: "non_sql_db",
+                        text: "Non-SQL DB (Redis / MongoDB)",
+                    }, {
+                        value: "ci_cd_pipelines",
+                        text: "Setting up CI / CD pipelines (Github actions / GitLabCI / Jenkins)",
+                    }, {
+                        value: "queues",
+                        text: "Queues (Kafka)",
+                    }, {
+                        value: "monitoring_observability",
+                        text: "Monitoring & Observability (metrics, logs, visualizations)",
+                    }, {
+                        value: "api_testing",
+                        text: "API testing (postman, hurl, custom clients)",
+                    }, {
+                        value: "networking",
+                        text: "Networking",
+                    }, {
+                        value: "kubernetes",
+                        text: "Kubernetes",
+                    },]
+                }, {
+                    type: "text",
+                    name: "others",
+                    title: "Other",
+                }]
+            }]
+        };
+
+        function onComplete(survey) {
+            fetch('/api/surveys/' + SURVEY_ID, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(survey.data)
+            }).then(response => {
+                if (!response.ok) {
+                    response.json().then(data => {
+                        console.log(data);
+                    });
+                }
+            }).catch(error => {
+                console.log(error);
+            })
+        }
+
+        const survey = new Survey.Model(surveyJson);
+        survey.onComplete.add(onComplete);
+        survey.applyTheme(SurveyTheme.DoubleborderLight);
+
+        document.addEventListener("DOMContentLoaded", function () {
+            survey.render(document.getElementById("surveyContainer"));
+        });
+    </script>
+</head>
+<body>
+<div id="surveyContainer"></div>
+
+</body>
+</html>

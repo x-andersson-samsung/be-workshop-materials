@@ -3,7 +3,7 @@ title: "Devbook "
 level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-01-30 17-09-14
+modified_at: 2026-02-03 14-28-31
 slideNumber: "true"
 ---
 
@@ -107,6 +107,18 @@ Users can create resources with titles, URLs, descriptions, categories, and tags
 - Compiled
 - Statically typed
 - Garbage-collected
+</grid>
+
+--
+
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Why Go?
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left">
+- Easy to learn
+- Rich std library
 </grid>
 
 --
@@ -411,7 +423,85 @@ for i < 10 {
 	fmt.Println(i)
 }
 
+// Forever
+for {}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Switch
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left">
+- No default fallthrough - will only execute selected case
+- Switch cases can be any value or expression
+
+```go []
+var name string
+switch name {
+	case "John":
+		// Do something
+	case "Jane":
+	case "Test":
+		fallthrough
+	default:
+		// Handle default
+		
+today := time.Now().Weekday()
+switch time.Saturday {
+	case today + 0:
+		fmt.Println("Today.")
+	case today + 1:
+		fmt.Println("Tomorrow.")
+	default:
+		fmt.Println("Too far away.")
+	}
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Switch 2
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left">
+- Switch does not need condition
+
+```go []
+	t := time.Now()
+	switch {
+	case t.Hour() < 12:
+		fmt.Println("Good morning!")
+	case t.Hour() < 17:
+		fmt.Println("Good afternoon.")
+	default:
+		fmt.Println("Good evening.")
+	}
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Defer
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left">
+- Will be called after function returns
+- Function calls are pushed onto a stack (LIFO order)
+
+```go []
+defer fmt.Println("!")
+defer fmt.Print("world")
 
 
+fmt.Print("Hello ")
+// Will print Hello world!
+}
 ```
 </grid>
