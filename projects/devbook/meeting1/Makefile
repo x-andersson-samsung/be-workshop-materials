@@ -1,0 +1,3 @@
+
+exercises-test:
+	go test ./exercises/...

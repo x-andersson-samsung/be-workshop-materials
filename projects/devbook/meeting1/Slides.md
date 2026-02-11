@@ -3,12 +3,16 @@ title: "Devbook "
 level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-02-09 14-16-00
+modified_at: 2026-02-11 12-45-20
 slideNumber: "true"
 ---
 
  %% Required for proper codeblock width %%
 <style>
+
+li,p {
+	font-size: 32px;
+}
 
 code {
     font-size: 16px;
@@ -23,8 +27,6 @@ code {
 </style>
 
 %% Start of slides %%
-
----
 
 # Devbook 
 ## Meeting 1
@@ -60,7 +62,7 @@ Some projects might require some knowledge or attending a previous project.
 Meetings will be split into:
 - Discussing homework
 - New theory
-- Practical exercise - building on project
+- Practical exercise & building on project
 - Discussing next homework
 </grid>
 
@@ -93,7 +95,7 @@ Users can create resources with titles, URLs, descriptions, categories, and tags
 2. REST API
 3. Permanent storage with PostgreSQL
 4. Containerization with Docker
-5. Testing and Documentation
+5. Testing, Documentation & Best practices
 </grid>
 
 ---
@@ -108,6 +110,7 @@ Users can create resources with titles, URLs, descriptions, categories, and tags
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
 - Compiled
+- Expressive
 - Statically typed
 - Garbage-collected
 </grid>
@@ -165,7 +168,7 @@ var (
 	manyVars2 = "hello"
 )
 
-const unchangechable = 0
+const unchangeable = 0
 ```
 </grid>
 
@@ -239,6 +242,63 @@ fmt.Println(a) // Will print "2"
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
+### Errors
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Errors are first class types in Go
+```go []
+// Declare a variable
+var err error
+
+// Can be passed to and returned by functions
+func errHandler(err error) error {
+	return err
+}
+
+
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Error chaining
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Errors can be chained and joined.
+```go []
+var (  
+    err1    = errors.New("someError")  
+    err2    = errors.New("someError")  
+    errWrap = fmt.Errorf("%s:%w", "module", err1)  
+)
+
+// What are the messages of err1, err2, errWrap ?
+
+// True of False?
+err1 == err2, 
+errors.Is(err1, err2),
+err1.Error() == err2.Error(),
+
+err1 == errWrap,
+errors.Is(errWrap, err1),
+err1.Error() == errWrap.Error()
+
+errors.Is(errWrap, err1)
+errors.Is(err1, errWrap))
+```
+</grid>
+
+note:
+false, false, false
+false,true,false
+true, false
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
 ### Structs
 </grid>
 
@@ -280,10 +340,14 @@ An array's length is part of its type, so arrays cannot be resized.
 ### Slices
 </grid>
 
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+<grid drag="100 40" drop="0 10" align="left" justify-content="center">
 A slice is a dynamically-sized, flexible view into the elements of an array. 
 
 In simplified terms, it is a pointer to an array with length and capacity.
+</grid>
+
+<grid drag="100 50" drop="0 40" align="left" justify-content="center">
+
 ```go []
 // create a new array of size 5 and return slice on it
 slice := make([]int, 5) 
@@ -297,10 +361,32 @@ s[1] = 8
 
 fmt.Println(numbers)
 // 0, 9, 8, 3, 4, 5
-```
-</grid>
+``` 
+<!-- element class="fragment fade-in-then-out" data-fragment-index="1" -->
+</grid> 
 
-note: Slice contains 3 values -> pointer to beginning, size, capacity
+<grid drag="100 50" drop="0 40" align="left" justify-content="center">
+<!-- element class="fragment fade-in-then-outout" data-fragment-index="2" -->
+```mermaid
+flowchart TB
+    subgraph Slice_Header
+        A[Pointer: 0x2004]
+        B[Length: 3]
+        C[Capacity: 4]
+    end
+    
+    subgraph Array_in_Heap
+        D[0x2000: 1]
+        E[0x2004: 2]
+        F[0x2008: 3]
+        G[0x200C: 4]
+        H[0x2010: 5]
+    end
+    
+    A -- points to --> E
+``` 
+
+</grid> 
 
 --
 
@@ -308,34 +394,20 @@ note: Slice contains 3 values -> pointer to beginning, size, capacity
 ### Slices 2
 </grid>
 
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+<grid drag="100 85" drop="0 15" align="left" justify-content="center">
 Slice can be extended to add new values.
 ```go []
-// define a slice of size 3 and cap 5
-slice := make([]int, 3, 5) 
-
-// Let's add 2 values
+// define a slice of size 3 and cap 5 and add 2 values
+slice := make([]int, 3, 5)  
 slice = append(slice, 1)
-slice = append(slice, 2) // []int{0,0,0,1,2}
-
-
+slice = append(slice, 2)
 
 // This append will go beyond capacity 
 // and will cause reallocation and copy
 slice = append(slice, 3)
-
-// []int{0,0,0,1,2,3}
 ```
-</grid>
 
---
-
-<grid drag="100 10" drop="0 0" align="left" >
-### Slices 3
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-When building slices we can skip the bounds to use defaults
+When building slices we can skip the bounds
 
 ```go []
 var a [10]int
@@ -346,6 +418,7 @@ a[:10]
 a[0:]
 a[:]
 ```
+
 </grid>
 
 --
@@ -479,7 +552,7 @@ switch name {
 	case "John":
 		// Do something
 	case "Jane":
-	case "Test":
+	case "TestUser":
 		fallthrough
 	default:
 		// Handle default
@@ -796,9 +869,9 @@ You can assume that the passed value will be correct.
 
 ```go []
 // Sample calls
-Fibonacci("0") // returns 0
-Fibonacci("123") // returns 123
-Fibonacci("-432") // returns -432
+AtoI("0") // returns 0
+AtoI("123") // returns 123
+AtoI("-432") // returns -432
 ```
 
 Check if your code passes tests.
@@ -818,8 +891,8 @@ Write a function called **_ArrStats_** accepting an **_[]int_** and returning 3 
 
 ```go []
 // Sample calls
-Fibonacci([]int{0,1,2,3,4}) // returns (0, 4, 2.5)
-Fibonacci([]int{}) // returns (0, 0, 0)
+ArrStats([]int{0,1,2,3,4}) // returns (0, 4, 2.5)
+ArrStats([]int{}) // returns (0, 0, 0)
 ```
 
 Check if your code passes tests.
@@ -901,6 +974,291 @@ go 1.25.3
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
+### Main file
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go [|1-2|4-9|11-14]
+// Declare main package
+package main
+
+// Import IO related libraries
+import (
+	"fmt"   // Formatted I/O
+	"bufio" // Buffered I/O - useful for user input
+	"os"    // OS specific Stdin and Stdout
+)
+
+// Program entrypoint
+func main() {
+	fmt.Println("Hello World!")
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Item structure and store
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go [|1-7|9-21]
+// Item definition
+type Item struct {  
+    Name        string  
+    Description string  
+  
+    URL string  
+}  
+
+// Simple in-mem store with starting items
+var store = map[string]Item{  
+    "item1": {  
+       Name:        "item1",  
+       Description: "search engine",  
+       URL:         "https://google.pl",  
+    },  
+    "item2": {  
+       Name:        "item2",  
+       Description: "other search engine",  
+       URL:         "https://bing.com",  
+    },  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Listing and printing items
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go [|1-6|8-12]
+func ListItems() []Item {
+	arr := make([]Item, 0, len(store))
+	for _, item := range store {
+		arr = append(arr, item)
+	}
+}
+
+func PrintItems(items []Item) {
+	for _, item := range items {
+		fmt.Printf("%s : %s : %s\n", item.Name, item.URL, item.Description)
+	}
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Handling User input
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go [|1|3-11|13-21]
+const prompt = "> "
+
+func readLine() (string, error) {  
+    scanner := bufio.NewScanner(os.Stdin)  
+    scanner.Scan()  
+    if err := scanner.Err(); err != nil {  
+       return "", err  
+    }  
+  
+    return scanner.Text(), scanner.Err()  
+}
+
+func AskForString(question string) (string, error) {  
+    _, err := fmt.Printf("%s\n%s", question, prompt)  
+    if err != nil {  
+       return "", err  
+    }  
+  
+    answer, _ := readLine()  
+    return strings.TrimSpace(answer), nil  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Asking for a choice
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func AskForMapChoice(question string, choices map[string]string) (string, error) {  
+    // Print question  
+    _, err := fmt.Println(question)  
+    if err != nil {  
+       return "", err  
+    }  
+  
+    // Check for longest key for formatting  
+    maxLength := 0  
+    for key := range choices {  
+       if len(key) > maxLength {  
+          maxLength = len(key)  
+       }  
+    }  
+  
+    // Sort by key  
+    type choiceStruct struct {  
+       key   string  
+       value string  
+    }
+      
+    sortedChoices := make([]choiceStruct, 0, len(choices))  
+    for k, v := range choices {  
+       sortedChoices = append(sortedChoices, choiceStruct{key: k, value: v})  
+    }  
+    sort.Slice(sortedChoices, func(i, j int) bool { return sortedChoices[i].key < sortedChoices[j].key })  
+  
+    // Print choices  
+    for _, choice := range sortedChoices {  
+       fmt.Printf("%*s: %s\n", maxLength, choice.key, choice.value)
+    }  
+  
+    // Print prompt  
+    fmt.Print(prompt)
+  
+    // Read answer  
+    answer, err := c.readLine()  
+    if err != nil {  
+       return "", err  
+    }  
+  
+    // Validate  
+    if _, ok := choices[answer]; !ok {  
+       fmt.Println("Invalid choice")  
+       return c.AskForMapChoice(question, choices)  
+    }  
+  
+    return answer, nil  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Menu "view"
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go [|2-8|11-14|16-34]
+func menuView(cli *input.CLI) error {  
+    choice := map[string]string{  
+       "a": "Add",  
+       "e": "Edit", 
+       "d": "Delete",  
+       "l": "List",  
+       "q": "Exit",  
+    }  
+  
+    for {
+       choice, err := AskForMapChoice("Choose option", choices)  
+       if err != nil {  
+          return err  
+       }  
+  
+       switch choice {  
+       case "a":  
+          if err = addItemView(cli); err != nil {  
+             return err  
+          }  
+       case "e":  
+          fmt.Println("Not yet implemented")  
+       case "d":  
+          if err = deleteItemView(cli); err != nil {  
+             return err  
+          }  
+       case "l":  
+          printItems(ListItems())  
+       case "q":  
+          return nil  
+	  default:
+		  fmt.Println("Invalid choice")
+       }  
+       fmt.Println()  
+    }  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Add / Remove / List "views"
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go [|1-17|19-30|32-35]
+func addItemView(cli *input.CLI) error {  
+    name, err := cli.AskForString("Name")  
+    if err != nil {return err}  
+  
+    description, err := cli.AskForString("Description")  
+    if err != nil {return err}  
+  
+    url, err := cli.AskForString("URL")  
+    if err != nil {return err}  
+  
+    store[name] = Item{
+	    Name:        name,  
+		Description: description,  
+		URL:         url,
+	}
+    return nil  
+}  
+
+func deleteItemView(cli *input.CLI) error {  
+    name, err := cli.AskForString("Name")  
+    if err != nil {return err}  
+  
+    if _, ok := store[name]; !ok {  
+       fmt.Println("Item does not exist")  
+       return nil
+    }  
+  
+    delete(store, name)  
+    return nil  
+}
+
+func printItems() {  
+    for _, item := range store {  
+       fmt.Printf("%s : %s : %s\n", item.Name, item.URL, item.Description)  
+    }  
+}  
+```
+</grid>
+
+---
+
+# Refactor
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Issues
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+- Global store variable 
+- Mixing responsibilities in one file
+	- Logic
+	- User input
+	- Storage
+- Not ready for future expansion
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
 ### Folder structure
 </grid>
 
@@ -909,36 +1267,32 @@ Basic project structure :
 ```
 devbook
 |- cmd         - for our main file
-|	|- main.go
+|  |- main.go
 |-pkg          - place for our packages
-|	|- devbook   - our models
-|	|	|- store.go
-|	|	|- item.go
-|	|- cli       - handling user interface
-|	|	|- input.go	
+|  |- devbook   - our models
+|  |  |- store.go
+|  |  |- item.go
+|  |- tui       - handling user interface & interaction
+|  |  |- input.go
+|  |  |- views.go
 ```
 </grid>
+
+---
+
+# Homework
 
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
-### Useful libraries
+### Assignments
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-**_fmt_** - Formatting strings
-```
-fmt.Printf
-fmt.Println
-```
-
-**_io_** - Input / Output
-```
-io.Reader
-io.Scanner
-io.Writer
-```
+- Add editing
+- Complete all exercises
+- Take a look at:
+	- [Tour of Go](https://go.dev/tour/welcome/1) - great introduction to Go
 </grid>
 
---
-
+---
