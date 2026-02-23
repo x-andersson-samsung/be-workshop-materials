@@ -1,6 +1,6 @@
 ## Project Overview
 
-DevBook is a simple application where developers can save, categorize, and manage useful resources like articles, tutorials, tools, and libraries. Users can create resources with titles, URLs, descriptions, categories, and tags.
+DevBook is a simple application where developers can save, categorize, and manage useful resources like articles, tutorials, tools, and libraries. Users can create resources with titles, URLs, descriptions and tags.
 #level_basic 
 
 ## Learning Objectives
@@ -90,7 +90,7 @@ __Homework Assignment:__
 **Task**: Build a complete REST API
 1. Implement missing functions (update, delete)
 2. Implement pagination for resource listing
-3. Add filtering by category and tags
+3. Add filtering by tags
 4. Create search endpoint with query parameters
 5. Add sorting options (by date, title, etc.)
 6. Implement proper validation for all endpoints
@@ -111,7 +111,7 @@ __Homework Assignment:__
 
 __Topics Covered:__
 - PostgreSQL basics and setup
-- Database design for resources and categories
+- Database design for resources and tags
 - Go database/sql package
 - pgx driver for PostgreSQL
 - Environment variables and configuration
@@ -130,11 +130,8 @@ __Homework Assignment:__
 
 **Task**: Complete the database integration
 1. Implement UPDATE and DELETE operations for resources
-2. Add a categories table and foreign key relationship
-3. Create a function to list resources by category
-4. Add proper error handling for database operations
-5. Implement connection pooling
-6. **Bonus**: Add a tags system (many-to-many relationship)
+2. Create a function to list resources by tag
+3. Add proper error handling for database operations
 
 **Deliverables**:
 - Database schema diagram
@@ -239,14 +236,8 @@ Resources:
 - Title (string)
 - URL (string)
 - Description (text)
-- CategoryID (foreign key)
 - CreatedAt (timestamp)
 - UpdatedAt (timestamp)
-
-Categories:
-- ID (int)
-- Name (string)
-- Description (text)
 
 Tags:
 - ID (int)
@@ -263,7 +254,5 @@ ResourceTags: (junction table)
 - `POST /api/resources` - Create new resource
 - `PUT /api/resources/{id}` - Update resource
 - `DELETE /api/resources/{id}` - Delete resource
-- `GET /api/categories` - List categories
-- `GET /api/resources?category={id}` - Filter by category
-- `GET /api/resources?category={tag}` - Filter by category
+- `GET /api/resources?tag={tag}` - Filter by tag
 - `GET /api/resources?search={term}` - Search resources

@@ -3,7 +3,7 @@ title: "Devbook "
 level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-02-23 07-28-35
+modified_at: 2026-02-12 13-06-12
 slideNumber: "true"
 ---
 
@@ -29,123 +29,251 @@ code {
 %% Start of slides %%
 
 # Devbook 
-## Meeting 1
+## Meeting 2
 
 ---
 
-# Introduction
+<grid drag="100 10" drop="0 0" align="left">
+### Plan
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+- Introduce REST API concepts
+- Add http server to our app
+- Basic resource operations (CRUD)
+- Go templates
+</grid>
+
+---
+
+# REST
 
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
- ### Goal
+### What is REST?
 </grid>
 
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+REST (Representational State Transfer) is a set of rules for building web services that use HTTP methods (GET, POST, PUT, DELETE) to work with data. It's stateless, meaning each request contains all needed information, and uses standard web protocols making it simple and widely adopted for APIs.
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Rules of REST
+**_1. Uniform interface_**
+</grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-- A project based introduction to BE concepts
-- Each project taking around 5 meetings
-- Finished application at the end
+
+
+All requests made via API must respect that API’s formatting rules. 
+
+No matter what client is making the request, it must put each piece of information where every other client would put it.
+
+One example is the URL used for identifying resources via HTTP.
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Rules of REST
+**_2. Client-server separation_**
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+
+
+REST APIs require that client and server applications are totally independent of each other.
+
+The client need only know the full name of the resource it wants.
+
+The only knowledge client and server have of each other is that exchanged by API transactions.
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Rules of REST
+**_3. Statelessness_**
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+
+
+Each client request must contain all the information needed to process it, and the server need not hold any information about that request once it has been received.
+
+There is no concept of a session in REST API design and the server is stateless with respect to any particular client.
+</grid>
+
+--
+
+<grid drag="100 5" drop="0 0" align="left" >
+### Rules of REST
+**_4. Cacheability_**
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Resources should be cacheable at one or more points within or between client and server.
+
+In the case of the server, if a particular resource has been served, and it is likely to be requested again within a certain time, it should be cached for a more rapid subsequent response. 
+
+The server should indicate via the API whether a resource can be safely cached locally at the client, including the lifetime of the data, where appropriate.
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Rules of REST
+**_5. Layered system architecture_**
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+A client can make no assumptions about whether it is communicating directly with a server holding a particular resource, or whether it is being served by an intermediate such as a service broker, load balancer, content delivery system or other subsystem closer to the client than the server.
+
+This provides system and infrastructure designers considerable flexibility to maximise the efficiency and reliability of request satisfaction across the global wired and wireless infrastructure.
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Rules of REST
+**_6. Code on demand_**
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+While REST APIs can and frequently do serve only data for consumption by the client, it is increasingly common for code to be delivered to run on the client, such as Java objects or Javascript web apps. If this is implemented, then such code can only be run on demand by the client.
+</grid>
+
+---
+
+# Best practices
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Singleton vs Collection
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+A resource can be a singleton or a collection
+
+For example **_customers_** is a collection while **_customer_** is a singleton
+
+```
+/customers      // a collection resource
+/customers/{id} // singleton resource
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Sub collections
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Subcollections should extend the location.
+
+For example if **_customer_** has **_account_** resources.
+
+```
+/customers/{id}/accounts          // all accounts belonging to customer {id}
+/customers/{id}/accounts/{acc_id} // a single account of customer {id}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Best practices
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+- Use nouns to represent resources
+- Use singular for singletons and plural for collections
+- Use forward slash (/) to indicate hierarchical relationships
+- Do not use file extensions
+- Do not use CRUD function names in URIs
+- Use query component to filter URI collection
+- [And many more](https://restfulapi.net/rest-api-best-practices/)
 </grid>
 
 note: 
-Some projects might require some knowledge or attending a previous project.
+Do not use file extensions
+For file extensions you should rely on `Content-Type` headers
 
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
- ### Meeting
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-Meetings will be split into:
-- Discussing homework
-- New theory
-- Practical exercise & building on project
-- Discussing next homework
-</grid>
-
----
-
-# Project
-
---
-
-<grid drag="100 10" drop="0 0" align="left">
-### Description
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-_**DevBook**_ is a simple app where developers can manage useful resources like articles, tutorials, tools, and libraries. 
-
-Users can create resources with titles, URLs, descriptions, categories, and tags.
-</grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left">
-### Steps
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-1. Basic functionality with Terminal UI
-2. REST API
-3. Permanent storage with PostgreSQL
-4. Containerization with Docker
-5. Testing, Documentation & Best practices
-</grid>
+Do not use CRUD function names in URIs
+You should use HTTP request methods instead
 
 ---
 
 # Go
 
---
+---
 
 <grid drag="100 10" drop="0 0" align="left" >
-### What is Go?
+### Http servers
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-- Compiled
-- Expressive
-- Statically typed
-- Garbage-collected
-</grid>
+Go standard library provides a package for setting up both HTTP clients and servers.
 
---
+###### Simplest
+```go [|5-7|11-14]
+import "net/http"
 
-
-<grid drag="100 10" drop="0 0" align="left" >
-### Why Go?
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-- Easy to learn
-- Rich std library
-</grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
-### Syntax
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-```go []
-package main
-
-import (
-	"fmt"
-)
-
-func name() string {
-	return "World"
+// Handling function for std must have the signature:  
+// func(http.ResponseWriter, *http.Request)  
+func indexHandler(w http.ResponseWriter, r *http.Request) {  
+    w.Write([]byte("Hello World!"))  
+}  
+  
+func main() {  
+    // Start server  
+    if err := http.ListenAndServe(
+	    ":8080",
+	     http.HandlerFunc(indexHandler)
+	 ); err != nil {  
+       panic(err)  
+    }  
 }
+```
+</grid>
 
-func main() {
-	name := name()
-	fmt.Printf("Hello %s!\n", name)
+--
+
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Http servers
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Go standard library provides a package for setting up both HTTP clients and servers.
+
+###### Simple
+```go [|3-7|9-10|12-15|17-20]
+import "net/http"
+
+// Handling function for std must have the signature:  
+// func(http.ResponseWriter, *http.Request)  
+func indexHandler(w http.ResponseWriter, r *http.Request) {  
+    w.Write([]byte("Hello World!"))  
+}  
+func main() {  
+    // Setup HTTP multiplexer  
+    mux := http.NewServeMux()  
+  
+    // Add routes  
+    mux.HandleFunc("/", indexHandler)  
+    mux.HandleFunc("GET /users", userListHandler)  
+    mux.HandleFunc("GET /users/{id}", userGetHandler)  
+  
+    // Start server  
+    if err := http.ListenAndServe(":8080", mux); err != nil {  
+       panic(err)  
+    }  
 }
 ```
 </grid>
@@ -153,20 +281,69 @@ func main() {
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
-### Variables
+### Http servers
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-```go []
-var longVar int = 0
-shortVar := 0
+Go standard library provides a package for setting up both HTTP clients and servers.
 
-var (
-	manyVars1 = 0
-	manyVars2 = "hello"
-)
+###### Advanced 1 - Handler
+```go [|7-11|13-20]
+import "net/http"
 
-const unchangeable = 0
+type  UserStore interface {
+	Get(id string) (User, err)
+}
+
+// Instead of passing functions we can use our own handler as long as
+// it implements `http.Handler` interface
+type UserHandler struct {
+	user  UserStore
+}
+
+func (usrH UserHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	// Get id from path
+	id := r.PathValue("id")
+
+	 user, err := usrH.user.Get(id)
+	 // handle error or return user
+	 // ...
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Http servers
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Go standard library provides a package for setting up both HTTP clients and servers.
+
+###### Advanced 2 - Server
+```go [|7-8|9|10|11-14|15|16-17]
+import "net/http"
+
+func main() {  
+	// http.Server gives us a lot of fields to modify server behaviour 
+	// instead of using the default one
+    srv := &http.Server{  
+       Addr:                         "localhost:8080",  
+       Handler:                      &UserHandler{},  
+       DisableGeneralOptionsHandler: false,  
+       TLSConfig:                    nil,  
+       ReadTimeout:                  0,  
+       ReadHeaderTimeout:            0,  
+       WriteTimeout:                 0,  
+       IdleTimeout:                  0,  
+       MaxHeaderBytes:               0,  
+       BaseContext:                  nil,  
+       ConnContext:                  nil,  
+    }  
+    srv.ListenAndServe()                          // !!In code handle error
+    srv.ListenAndServeTLS("cert.pem", "key.pem")  // !!In code handle error
+}
 ```
 </grid>
 
@@ -213,38 +390,6 @@ Uninitialized values are given initial zero value depending on type:
 - **_false_** - for the boolean type
 - **_""_** - (the empty string) for strings.
 - **_nil_** - for pointers and pointer based types (slices, maps, interfaces)
-</grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
-### Type casting
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-Go does not perform implicit casting. If you want to change variable type you have to do it explicitly.
-
-```go[]
-var (
-	i int
-	i32 int32
-	f64 float64
- )
-
-// f64 + i   // Not allowed, cannot add float to integer
-f64 + float64(i) // Will change `i` to float64
-
-// i32 + i   // Not allowed, `i32` and `i` are of different types 
-i32 + int32(i) // Will change `i` to int32
-
-type MyInt int // Create an alias type on int
-var mInt MyInt
-
-// myInt + i  // Not allowed, `myInt` is it's own type now
-int(myInt) + i       // Change `myInt` to int
-myInt + MyInt(i)  // Change `i` to MyInt
-```
-
 </grid>
 
 --
@@ -377,7 +522,7 @@ In simplified terms, it is a pointer to an array with length and capacity.
 </grid>
 
 <grid drag="100 50" drop="0 40" align="left" justify-content="center">
-<!-- element class="fragment fade-in-then-out" data-fragment-index="1" -->
+
 ```go []
 // create a new array of size 5 and return slice on it
 slice := make([]int, 5) 
@@ -392,6 +537,7 @@ s[1] = 8
 fmt.Println(numbers)
 // 0, 9, 8, 3, 4, 5
 ``` 
+<!-- element class="fragment fade-in-then-out" data-fragment-index="1" -->
 </grid> 
 
 <grid drag="100 50" drop="0 40" align="left" justify-content="center">
@@ -414,6 +560,7 @@ flowchart TB
     
     A -- points to --> E
 ``` 
+
 </grid> 
 
 --
@@ -476,36 +623,6 @@ v, ok := m[2] // Will return 0, false
 delete(m, 1)
 ```
 </grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
-### Collection functions
-</grid>
-
-<grid drag="100 85" drop="0 15" align="left" justify-content="center">
-You can get the size and capactity of a collection using built-in **_len_** and **_cap_**  functions.
-```go []
-// define a slice of size 3 and cap 5 and add 2 values
-var (
-	arr [5]int
-	slice = arr[1:4]
-	m = map[int]int{0:1} 
-)
-
-len(arr) // Returns 5
-cap(arr) // Returns 5
-
-len(slice) // Returns 3
-cap(slice) // Returns 4
-
-len(m) // Returns 1
-// cap(m) // Maps don't have capacity
-
-```
-
-</grid>
-
 
 ---
 
@@ -691,7 +808,7 @@ func named() (i int64, err error) {
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
-### Passing arguments
+### Move semantics
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
@@ -711,7 +828,8 @@ byRef(&a) // Will pass a pointer to value
 ```
 Can make a big impact when passing large structures
 
-Things always passed by reference:
+note:
+Things passed by reference always:
 - arrays - (pointer, length)
 - slices - (pointer, length, capacity)
 - maps - (pointer)
@@ -775,31 +893,6 @@ func ReadAll(r Reader) (data []byte, err error) {
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
-### Interfaces - Good practice
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-_Accept interfaces, Return Structs_
-
-```go []
-type Reader interface {
-	Read(p []byte) (n int, err error)
-}
-
-type File struct {}
-
-func NewFileReader(path string) *File {}
-
-func ReadAll(r Reader) (data []byte, err error) {}
-```
-
-Allows for greatest flexibility
-
-</grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
 ### Defer
 </grid>
 
@@ -848,27 +941,6 @@ func main() {
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
-### Folders
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-```[]
-root
-|- cmd         - main packages for executables, with subdirectories for each binary
-|- internal    - packages only intended for use within the current project
-|- pkg         - library code that can be imported by external projects
-|- api         - API definitions (protobuf files, OpenAPI etc.)
-|- web         - static assets and templates for web apps
-|- conf        - config files
-|- scripts     - build & deployment scripts, automation
-|- build       - CI files (Dockerfiles, Makefiles)
-|- docs        - documentation
-```
-</grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
 ### Public vs Private
 </grid>
 
@@ -885,61 +957,6 @@ const PacketTTL = time.Second * 3600 // public value
 ```
 
 The same goes for functions and types.
-</grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
-### Main file
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-```go [|1-2|4-9|11-14]
-// Declare main package
-package main
-
-// Import IO related libraries
-import (
-	"fmt"   // Formatted I/O
-)
-
-// Program entrypoint
-func main() {
-	fmt.Println("Hello World!")
-}
-```
-</grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
-### Tests
-</grid>
-
-<grid drag="100 85" drop="0 10" align="left" justify-content="center">
-```go [|1|3-5|8|9-12|13|14-20]
-package main // or main_test
-
-import (
-	"testing" // Test types and functions
-)
-
-// Function must start with `Test*` and accept only `*testing.T`
-func TestFibonacci(t *testing.T) {  
-    type testCase struct {  
-       input int  
-       want  int  
-    }  
-    cases := []testCase{{...}}  
-    for _, tc := range cases {  
-       t.Run(fmt.Sprintf("Fibonacci(%d)", tc.input), func(t *testing.T) {  
-          if got := Fibonacci(tc.input); got != tc.want {  
-             t.Errorf("Fibonacci(%d) = %d, want %d", tc.input, got, tc.want)  
-          }  
-       })  
-    }  
-}
-```
 </grid>
 
 ---
@@ -1033,11 +1050,6 @@ AtoI("-432") // returns -432
 ```
 
 Check if your code passes tests.
-
-Hints:
-- You can treat string as an array.
-- You can subtract bytes to get digit value. ('1' - '0' == 1)
-
 </grid>
 
 --
@@ -1048,9 +1060,9 @@ Hints:
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
 Write a function called **_ArrStats_** accepting an **_[]int_** and returning 3 values:
-- min int
-- max int
-- average float64
+- min
+- max
+- average
 
 ```go []
 // Sample calls
@@ -1125,57 +1137,12 @@ cd devbook
 go mod init devbook
 ```
 
-Initialize a module with **_go.mod_** file
+It will create a **_go.mod_** file describing our module
 
 ```
 module devbook
 
 go 1.25.3
-```
-</grid>
-
---
-
-<grid drag="100 10" drop="0 0" align="left" >
-### go.mod & go.sum
-</grid>
-
-<grid drag="100 10" drop="0 15" align="left" justify-content="center">
-Introduced in Go 1.11 for managing external dependencies
-</grid>
-
-<grid drag="100 85" drop="0 25" align="left" justify-content="top">
-<!-- element class="fragment fade-out" data-fragment-index="1" -->
-
-**_go.mod_** stores module information
-
-```
-module devbook  
-
-go 1.25
-
-require (
-        github.com/oklog/ulid/v2 v2.1.0
-)
-
-require (
-        golang.org/x/text v0.18.0 // indirect
-)
-
-```
-
-</grid>
-
-
-<grid drag="100 85" drop="0 25" align="left" justify-content="top">
-<!-- element class="fragment fade-in" data-fragment-index="1" -->
-**_go.sum_** stores hashes of dependencies for validation
-```
-github.com/oklog/ulid/v2 v2.1.0 h1:+9lhoxAP56we25tyYETBBY1YLA2SaoLvUFgrP2miPJU=
-github.com/oklog/ulid/v2 v2.1.0/go.mod h1:rcEKHmBBKfef9DhnvX7y1HZBYxjXb0cP5ExxNsTT1QQ=
-golang.org/x/text v0.18.0 h1:XvMDiNzPAl0jr17s6W9lcaIhGUfUORdGCNsuLmPG224=
-golang.org/x/text v0.18.0/go.mod h1:BuEKDfySbSR4drPmRPG/7iBdf8hvFMuRexcpahXilzY=
-
 ```
 </grid>
 
@@ -1239,6 +1206,29 @@ var store = map[string]Item{
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
+### Listing and printing items
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go [|1-6|8-12]
+func ListItems() []Item {
+	arr := make([]Item, 0, len(store))
+	for _, item := range store {
+		arr = append(arr, item)
+	}
+}
+
+func PrintItems(items []Item) {
+	for _, item := range items {
+		fmt.Printf("%s : %s : %s\n", item.Name, item.URL, item.Description)
+	}
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
 ### Handling User input
 </grid>
 
@@ -1262,8 +1252,8 @@ func AskForString(question string) (string, error) {
        return "", err  
     }  
   
-    answer, err := readLine()  
-    return strings.TrimSpace(answer), err
+    answer, _ := readLine()  
+    return strings.TrimSpace(answer), nil  
 }
 ```
 </grid>
@@ -1312,7 +1302,7 @@ func AskForMapChoice(question string, choices map[string]string) (string, error)
     fmt.Print(prompt)
   
     // Read answer  
-    answer, err := readLine()  
+    answer, err := c.readLine()  
     if err != nil {  
        return "", err  
     }  
@@ -1320,7 +1310,7 @@ func AskForMapChoice(question string, choices map[string]string) (string, error)
     // Validate  
     if _, ok := choices[answer]; !ok {  
        fmt.Println("Invalid choice")  
-       return AskForMapChoice(question, choices)  
+       return c.AskForMapChoice(question, choices)  
     }  
   
     return answer, nil  
@@ -1336,7 +1326,7 @@ func AskForMapChoice(question string, choices map[string]string) (string, error)
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
 ```go [|2-8|11-14|16-34]
-func menuView() error {  
+func menuView(cli *input.CLI) error {  
     choice := map[string]string{  
        "a": "Add",  
        "e": "Edit", 
@@ -1353,13 +1343,13 @@ func menuView() error {
   
        switch choice {  
        case "a":  
-          if err = addItemView(); err != nil {  
+          if err = addItemView(cli); err != nil {  
              return err  
           }  
        case "e":  
           fmt.Println("Not yet implemented")  
        case "d":  
-          if err = deleteItemView(); err != nil {  
+          if err = deleteItemView(cli); err != nil {  
              return err  
           }  
        case "l":  
@@ -1383,14 +1373,14 @@ func menuView() error {
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
 ```go [|1-17|19-30|32-35]
-func addItemView() error {  
-    name, err := AskForString("Name")  
+func addItemView(cli *input.CLI) error {  
+    name, err := cli.AskForString("Name")  
     if err != nil {return err}  
   
-    description, err := AskForString("Description")  
+    description, err := cli.AskForString("Description")  
     if err != nil {return err}  
   
-    url, err := AskForString("URL")  
+    url, err := cli.AskForString("URL")  
     if err != nil {return err}  
   
     store[name] = Item{
@@ -1401,8 +1391,8 @@ func addItemView() error {
     return nil  
 }  
 
-func deleteItemView() error {  
-    name, err := AskForString("Name")  
+func deleteItemView(cli *input.CLI) error {  
+    name, err := cli.AskForString("Name")  
     if err != nil {return err}  
   
     if _, ok := store[name]; !ok {  
@@ -1474,10 +1464,10 @@ devbook
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-- Add editing items
+- Add editing
 - Complete all exercises
 - Take a look at:
-	- [Tour of Go](https://go.dev/tour/welcome/1) - great introduction to Go
+	- [REST]([https://go.dev/tour/welcome/1](https://restfulapi.net/resource-naming/)) - best practices for REST API
 </grid>
 
 ---
