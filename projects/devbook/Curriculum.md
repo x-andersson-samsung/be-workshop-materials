@@ -1,3 +1,11 @@
+---
+title: Curriculum
+level:
+tags: []
+created_at: 2026-01-26 07-12-12
+modified_at: 2026-02-24 12-02-23
+---
+
 ## Project Overview
 
 DevBook is a simple application where developers can save, categorize, and manage useful resources like articles, tutorials, tools, and libraries. Users can create resources with titles, URLs, descriptions and tags.
