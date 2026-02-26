@@ -3,7 +3,7 @@ title: "Devbook "
 level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-02-24 11-59-49
+modified_at: 2026-02-26 17-08-52
 slideNumber: "true"
 ---
 
@@ -655,7 +655,6 @@ Write an "echo" server with its client.
 - **_GET /echo_** return "Hello World!".
 - **_POST /echo_** return provided body.
 
-Check if your code passes tests.
 </grid>
 
 --
@@ -665,12 +664,18 @@ Check if your code passes tests.
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-Write a small calculator
+Write 2 handlers. Each will receive 2 query parameters **_a_** and **_b_**.
 
-- **_GET /add?a=5&b=3_** should return 8.
-- **_GET /sub?a=5&b=3_** should return 2.
+- AddHandler - returning sum of a & b
+- SubHandler - returning difference of a & b
 
-Check if your code passes tests.
+You can assume input will be correct and skip error checking.
+
+Hint: 
+
+- **_strconv.Atoi_** & **_strconv.ItoA_** will help convert types
+- You can cast **_string_** to **_[]byte_** to use in **_w.Write_**
+
 </grid>
 
 --
@@ -697,8 +702,6 @@ Expected response format:
 	"result": 10
 }
 ``` 
-
-Check if your code passes tests.
 </grid>
 
 ---
@@ -706,3 +709,280 @@ Check if your code passes tests.
 # Back to Devbook
 
 --
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Preparations
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Add **_ID_** to Item:
+```go []
+type Item struct {  
+    ID          int    `json:"id"`  
+    Name        string `json:"name"`  
+    Description string `json:"description"`  
+    URL         string `json:"URL"`  
+}
+```
+
+Modify store to be based on ID:
+```go
+type Store struct {  
+    nextID int  
+    data   map[int]Item  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Preparations - store functions
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func (store *Store) GetByID(id int) (Item, bool) {  
+    item, ok := store.data[id]  
+    return item, ok  
+}  
+  
+func (store *Store) GetByName(name string) (Item, bool) {  
+    for _, item := range store.data {  
+       if item.Name == name {  
+          return item, true  
+       }  
+    }  
+  
+    return Item{}, false  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Preparations - store functions
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func (store *Store) Add(item Item) {  
+    item.ID = store.nextID  
+    store.nextID++  
+  
+    store.data[item.ID] = item  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Preparations - store functions
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func (store *Store) DeleteByID(id int) {  
+    delete(store.data, id)  
+}  
+  
+func (store *Store) DeleteByName(name string) {  
+    for id, item := range store.data {  
+       if item.Name == name {  
+          delete(store.data, id)  
+          return  
+       }  
+    }  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Preparations - store functions
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func (store *Store) List() []Item {  
+    arr := make([]Item, 0, len(store.data))  
+    for _, item := range store.data {  
+       arr = append(arr, item)  
+    }  
+  
+    slices.SortFunc(arr, func(i, j Item) int {  
+       if i.ID == j.ID {  
+          return 0  
+       }  
+       if i.ID > j.ID {  
+          return 1  
+       }  
+       return -1  
+    })  
+  
+    return arr  
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Http Handler
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Lets' create new package **_pkg/api_**
+```go []
+type ItemHandler struct {  
+    Store *devbook.Store  
+}
+
+func (i *ItemHandler) Register(r *http.ServeMux) {  
+    r.HandleFunc("POST /items", i.Create)  
+    r.HandleFunc("GET /items", i.List)  
+    r.HandleFunc("PUT /items/{id}", i.Update)  
+    r.HandleFunc("DELETE /items/{id}", i.Delete)  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Http Handler - List
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func (i *ItemHandler) List(w http.ResponseWriter, r *http.Request) {  
+    items := i.Store.List()  
+  
+    payload, err := json.Marshal(items)  
+    if err != nil {  
+       http.Error(w, err.Error(), http.StatusInternalServerError)  
+       return  
+    }  
+  
+    w.WriteHeader(http.StatusOK)  
+    w.Write(payload)  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Http Handler - Create
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func (i *ItemHandler) Create(w http.ResponseWriter, r *http.Request) {  
+    var item devbook.Item  
+    err := json.NewDecoder(r.Body).Decode(&item)  
+    if err != nil {  
+       http.Error(w, err.Error(), http.StatusBadRequest)  
+       return  
+    }  
+  
+    i.Store.Add(item)  
+  
+    w.WriteHeader(http.StatusNoContent)  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Http Handler - Delete
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func (i *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {  
+    idStr := r.PathValue("id")  
+    if idStr == "" {  
+       http.Error(w, "Missing id", http.StatusBadRequest)  
+       return  
+    }  
+  
+    id, err := strconv.Atoi(idStr)  
+    if err != nil {  
+       http.Error(w, err.Error(), http.StatusBadRequest)  
+       return  
+    }  
+  
+    i.Store.DeleteByID(id)  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Adapting main - getting index.html
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go[]
+// Option 1 - embed the index file into the binary
+
+//go:embed static/items.html  
+var indexData []byte  
+
+// Option 2 - read the file to memory on program start
+func readIndexFile(path string) ([]byte, error) {  
+    return os.ReadFile(path)  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Adapting main - server setup
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go[]
+func setupAndRunServer(store *devbook.Store, indexData []byte) error {  
+    mux := http.NewServeMux()  
+  
+    mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {  
+       w.Write(indexData)  
+    })  
+  
+    itemHandler := api.ItemHandler{Store: store}  
+    itemHandler.Register(mux)  
+  
+    fmt.Println("Starting server on " + ServerAddress)  
+    return http.ListenAndServe(ServerAddress, mux)  
+}
+```
+</grid>
+
+---
+
+# Homework
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Assignments
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+- Add support for editing items on **_"PUT /items/{id}"_**
+- Add pagination support to **_List_**
+	- Hint: FE is sending **_offset_** and **_limit_** query values
+- (optional) Add URL validation to **_Create_** and **_Update_**
+    - Should return different error to FE
+    - For validation see: [url.Parse](https://pkg.go.dev/net/url#Parse)
+- Complete exercises
+</grid>
+
+---

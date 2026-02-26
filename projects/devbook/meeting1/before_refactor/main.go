@@ -26,8 +26,8 @@ func AskForString(question string) (string, error) {
 		return "", err
 	}
 
-	answer, _ := readLine()
-	return strings.TrimSpace(answer), nil
+	answer, err := readLine()
+	return strings.TrimSpace(answer), err
 }
 
 func AskForMapChoice(question string, choices map[string]string) (string, error) {
@@ -133,6 +133,44 @@ func addItemView() error {
 	return nil
 }
 
+func editItemView() error {
+	name, err := AskForString("Name")
+	if err != nil {
+		return err
+	}
+
+	if _, ok := store[name]; !ok {
+		fmt.Println("Item does not exist")
+		return nil
+	}
+
+	newName, err := AskForString("New Name")
+	if err != nil {
+		return err
+	}
+
+	description, err := AskForString("New Description")
+	if err != nil {
+		return err
+	}
+
+	url, err := AskForString("New URL")
+	if err != nil {
+		return err
+	}
+
+	if newName != name {
+		delete(store, name)
+	}
+
+	store[name] = Item{
+		Name:        newName,
+		Description: description,
+		URL:         url,
+	}
+	return nil
+}
+
 func deleteItemView() error {
 	name, err := AskForString("Name")
 	if err != nil {
@@ -151,8 +189,8 @@ func deleteItemView() error {
 func menuView() error {
 	choices := map[string]string{
 		"a": "Add",
-		//"e":   "Edit",
-		"d": "Delete",
+		"e": "Edit",
+		"d": "DeleteByID",
 		"l": "List",
 		"q": "Exit",
 	}
@@ -169,7 +207,9 @@ func menuView() error {
 				return err
 			}
 		case "e":
-			fmt.Println("Not yet implemented")
+			if err = editItemView(); err != nil {
+				return err
+			}
 		case "d":
 			if err = deleteItemView(); err != nil {
 				return err

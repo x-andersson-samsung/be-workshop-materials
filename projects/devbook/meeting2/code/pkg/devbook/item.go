@@ -1,8 +1,8 @@
 package devbook
 
 type Item struct {
-	Name        string
-	Description string
-
-	URL string
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	URL         string `json:"URL"`
 }

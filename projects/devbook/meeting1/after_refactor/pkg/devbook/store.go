@@ -2,7 +2,7 @@ package devbook
 
 type Store map[string]Item
 
-func (store Store) Get(name string) (Item, bool) {
+func (store Store) GetByName(name string) (Item, bool) {
 	item, ok := store[name]
 	return item, ok
 }
@@ -11,7 +11,7 @@ func (store Store) Add(item Item) {
 	store[item.Name] = item
 }
 
-func (store Store) Delete(name string) {
+func (store Store) DeleteByName(name string) {
 	delete(store, name)
 }
 

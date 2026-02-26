@@ -37,13 +37,13 @@ func TestFilterEven(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(fmt.Sprintf("FilterEven(%#v)", tc.input), func(t *testing.T) {
 			got := FilterEven(tc.input)
-			
+
 			// Check if slices have the same length
 			if len(got) != len(tc.want) {
 				t.Errorf("FilterEven(%#v) = %#v, want %#v", tc.input, got, tc.want)
 				return
 			}
-			
+
 			// Check if all elements match
 			for i, v := range tc.want {
 				if got[i] != v {

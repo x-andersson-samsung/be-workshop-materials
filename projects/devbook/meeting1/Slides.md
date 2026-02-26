@@ -3,7 +3,7 @@ title: "Devbook "
 level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-02-23 07-28-35
+modified_at: 2026-02-26 10-05-09
 slideNumber: "true"
 ---
 
@@ -1433,22 +1433,38 @@ func printItems() {
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-- Global store variable 
 - Mixing responsibilities in one file
 	- Logic
 	- User input
 	- Storage
-- Not ready for future expansion
+- Global store variable 
+- Tight coupling
+
+- Validation & Performance - not a focus
 </grid>
 
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
-### Folder structure
+### Mixing responsibilities - problem
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-Basic project structure :
+- "Views" are handling user input and data storage
+- Hard to test - tests have to get "interactive"
+- Harder to reuse code
+- Harder to change / refactor code
+</grid>
+
+--
+
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Mixing responsibilities - solution
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Split into packages by domain:
 ```
 devbook
 |- cmd         - for our main file
@@ -1460,6 +1476,106 @@ devbook
 |  |- tui       - handling user interface & interaction
 |  |  |- input.go
 |  |  |- views.go
+```
+
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Global Store - problem
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+- Hidden dependencies
+- Testability issues
+- Concurrency hazards
+- Tight coupling
+</grid>
+
+note:
+- **Hidden dependencies**
+    - Functions may look pure but secretly depend on global state.
+    - Harder to reason about behavior because inputs/outputs aren’t explicit.
+- **Testability suffers**
+    - Tests become order-dependent if they share the same global store.
+    - Harder to run tests in parallel (common in Go) without state leaking between tests.
+    - Mocking becomes awkward: you end up patching globals and carefully resetting them.
+- **Concurrency hazards (especially in Go)**
+    - Shared mutable global state can cause **data races** unless you guard it (mutexes/atomics/channels).
+    - Even with locks, you can introduce deadlocks, contention, or subtle timing bugs.
+- **Tight coupling and reduced modularity**
+    - Many packages/modules become coupled to “the global store,” making refactors painful.
+    - Harder to reuse components in other projects because they assume a global exists.
+- **Initialization order and lifecycle problems**
+    - “Who initializes the store, and when?” becomes a recurring bug source.
+    - Cleanup is tricky (closing DB connections, flushing buffers, stopping goroutines).
+    - In Go, `init()` + globals can create fragile startup sequences.
+
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Global Store - solution
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Move to an independent structure
+```go [|1|3-6|8-10|12-14|16-23|25-26|]
+type Store map[string]Item  
+  
+func (store Store) GetByName(name string) (Item, bool) {  
+    item, ok := store[name]  
+    return item, ok  
+}  
+  
+func (store Store) Add(item Item) {  
+    store[item.Name] = item  
+}  
+  
+func (store Store) DeleteByName(name string) {  
+    delete(store, name)  
+}  
+  
+func (store Store) List() []Item {  
+    // Expressive way  
+    arr := make([]Item, 0, len(store))  
+    for _, item := range store {  
+       arr = append(arr, item)  
+    }  
+  
+    return arr  
+  
+    // Compact way  
+    //return slices.Collect(maps.Values(store))
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Tight coupling - problem
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+- View uses direct implementation
+- Harder to change to different source of data
+- Harder to test
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Tight coupling - solution
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Make views use an interface instead
+```go []
+type ItemStore interface {
+
+}
 ```
 </grid>
 

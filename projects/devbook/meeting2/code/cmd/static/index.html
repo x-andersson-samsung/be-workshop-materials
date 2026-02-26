@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Devbook Items</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            margin: 24px;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin: 0 0 16px;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 8px 12px;
+            max-width: 640px;
+            margin-bottom: 24px;
+        }
+
+        label {
+            align-self: center;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 6px 8px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 60px;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: #f7f7f7;
+            border-radius: 4px;
+        }
+
+        .btn.primary {
+            background: #2563eb;
+            color: #fff;
+            border-color: #1d4ed8;
+        }
+
+        .btn.danger {
+            background: #dc2626;
+            color: #fff;
+            border-color: #b91c1c;
+        }
+
+        .items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .item {
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+
+        .line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            align-items: baseline;
+        }
+
+        .meta {
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .desc {
+            margin-top: 6px;
+            color: #4b5563;
+            white-space: pre-wrap;
+        }
+
+        .actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .muted {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .edit-form {
+            margin-top: 10px;
+            border-top: 1px dashed #e5e7eb;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Items</h1>
+
+<form id="create-form">
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" required placeholder="e.g. google"/>
+
+    <label for="url">URL</label>
+    <input id="url" name="url" type="text" required placeholder="https://example.com"/>
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" placeholder="Short description"></textarea>
+
+    <div></div>
+    <div>
+        <button class="btn primary" type="submit">Add item</button>
+    </div>
+</form>
+
+<div id="pager" style="display:flex;align-items:center;gap:8px;margin: -8px 0 16px 0;flex-wrap:wrap;">
+    <span class="muted">Pagination</span>
+    <label class="muted" for="limit-input">limit</label>
+    <input id="limit-input" type="number" min="1" step="1" value="5" style="width:72px;padding:4px 6px;">
+    <label class="muted" for="offset-input">offset</label>
+    <input id="offset-input" type="number" min="0" step="1" value="0" style="width:84px;padding:4px 6px;">
+    <button id="apply-btn" class="btn" type="button">Apply</button>
+    <div style="flex:1 1 auto"></div>
+    <button id="prev-btn" class="btn" type="button">Prev</button>
+    <button id="next-btn" class="btn" type="button">Next</button>
+    <span id="page-info" class="muted"></span>
+</div>
+
+<div id="items" class="items" aria-live="polite"></div>
+
+<script>
+    const api = {
+        list: async (limit, offset) => {
+            const params = new URLSearchParams();
+            if (typeof limit === 'number' && limit > 0) params.set('limit', String(limit));
+            if (typeof offset === 'number' && offset > 0) params.set('offset', String(offset));
+            const q = params.toString();
+            const url = q ? `/items?${q}` : '/items';
+            return fetch(url).then(r => r.json());
+        },
+        create: async (item) => {
+            const res = await fetch('/items', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(item)
+            });
+            if (!res.ok) throw new Error(`Create failed (${res.status})\n${await res.text()}`);
+            return res
+        },
+        removeById: async (id) => {
+            const res = fetch(`/items/${encodeURIComponent(id)}`, {method: 'DELETE'});
+            if (!res.ok) throw new Error(`Delete failed (${res.status})\n${await res.text()}`);
+
+            return res;
+        },
+        edit: async (id, item) => {
+            const res = await fetch(`/items/${encodeURIComponent(id)}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(item)
+            })
+
+            if (!res.ok) throw new Error(`Edit failed (${res.status})\n${await res.text()}`);
+            return res;
+        },
+    };
+
+    const el = {
+        items: document.getElementById('items'),
+        createForm: document.getElementById('create-form'),
+        limitInput: document.getElementById('limit-input'),
+        offsetInput: document.getElementById('offset-input'),
+        applyBtn: document.getElementById('apply-btn'),
+        prevBtn: document.getElementById('prev-btn'),
+        nextBtn: document.getElementById('next-btn'),
+        pageInfo: document.getElementById('page-info'),
+    };
+
+    const state = {
+        limit: Number(document.getElementById('limit-input').value) || 5,
+        offset: Number(document.getElementById('offset-input').value) || 0,
+        lastCount: 0,
+    };
+
+    function itemRow(item) {
+        const container = document.createElement('div');
+        container.className = 'item';
+
+        const line = document.createElement('div');
+        line.className = 'line';
+
+        const id = document.createElement('span');
+        id.className = 'meta';
+        id.textContent = `id: ${item.id ?? ''}`;
+
+        const name = document.createElement('strong');
+        name.textContent = item.name;
+
+        const link = document.createElement('a');
+        link.href = item.URL || item.url || '#';
+        link.textContent = link.href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn';
+        editBtn.type = 'button';
+        editBtn.textContent = 'Edit';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'btn danger';
+        removeBtn.type = 'button';
+        removeBtn.textContent = 'Remove';
+
+        actions.append(editBtn, removeBtn);
+        line.append(id, name, link, actions);
+
+        const desc = document.createElement('div');
+        desc.className = 'desc';
+        desc.textContent = item.description || '';
+
+        const editForm = document.createElement('div');
+        editForm.className = 'edit-form hidden';
+        editForm.innerHTML = `
+        <div class="muted">Edit item (recreates item: DELETE + POST)</div>
+        <div style="display:grid;grid-template-columns:100px 1fr;gap:6px 10px;align-items:center;max-width:640px;">
+          <label>Name</label><input class="ef-name" type="text" value=${item.name || ''}>
+          <label>URL</label><input class="ef-url" type="text" value="${item.URL || ''}">
+          <label>Description</label><textarea class="ef-desc">${item.description || ''}</textarea>
+          <div></div><div style="display:flex;gap:8px;">
+            <button class="btn primary ef-save" type="button">Save</button>
+            <button class="btn ef-cancel" type="button">Cancel</button>
+          </div>
+        </div>
+      `;
+
+        editBtn.addEventListener('click', () => {
+            editForm.classList.toggle('hidden');
+        });
+
+        editForm.querySelector('.ef-cancel').addEventListener('click', () => {
+            editForm.classList.add('hidden');
+        });
+
+        editForm.querySelector('.ef-save').addEventListener('click', async () => {
+            const newName = editForm.querySelector('.ef-name').value.trim();
+            const newURL = editForm.querySelector('.ef-url').value.trim();
+            const newDesc = editForm.querySelector('.ef-desc').value;
+            const payload = {id: item.id, name: newName, URL: newURL, description: newDesc};
+            try {
+                await api.edit(payload);
+                await refresh();
+            } catch (e) {
+                alert('Update failed: ' + e.message);
+            }
+        });
+
+        removeBtn.addEventListener('click', async () => {
+            if (!confirm(`Remove item "${item.name}"?`)) return;
+            try {
+                const res = await api.removeById(item.id);
+                await refresh();
+            } catch (e) {
+                alert('Remove failed: ' + e.message);
+            }
+        });
+
+        container.append(line, desc, editForm);
+        return container;
+    }
+
+    function render(items) {
+        el.items.innerHTML = '';
+        if (!items || items.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'muted';
+            empty.textContent = 'No items yet';
+            el.items.appendChild(empty);
+            // Update page info/controls as well
+            state.lastCount = 0;
+            updatePager();
+            return;
+        }
+        items.forEach(it => el.items.appendChild(itemRow(it)));
+        state.lastCount = items.length;
+        updatePager();
+    }
+
+    async function refresh() {
+        try {
+            const data = await api.list(state.limit, state.offset);
+            render(data);
+        } catch (e) {
+            console.error(e);
+            alert('Failed to load items');
+        }
+    }
+
+    function clamp(n, min, max) {
+        return Math.max(min, Math.min(max, n));
+    }
+
+    function syncInputs() {
+        el.limitInput.value = String(state.limit);
+        el.offsetInput.value = String(state.offset);
+    }
+
+    function updatePager() {
+        // Disable Prev when at start
+        el.prevBtn.disabled = state.offset <= 0;
+        // If we received less than limit, we assume there is no next page
+        el.nextBtn.disabled = state.limit <= 0 || state.lastCount < state.limit;
+        el.pageInfo.textContent = ` | showing ${state.lastCount} item(s), offset ${state.offset}, limit ${state.limit}`;
+        syncInputs();
+    }
+
+    el.applyBtn.addEventListener('click', () => {
+        const newLimit = Number(el.limitInput.value);
+        const newOffset = Number(el.offsetInput.value);
+        state.limit = isFinite(newLimit) && newLimit > 0 ? Math.floor(newLimit) : state.limit;
+        state.offset = isFinite(newOffset) && newOffset >= 0 ? Math.floor(newOffset) : state.offset;
+        refresh();
+    });
+
+    el.prevBtn.addEventListener('click', () => {
+        const l = state.limit > 0 ? state.limit : state.lastCount || 0;
+        state.offset = clamp(state.offset - l, 0, Number.MAX_SAFE_INTEGER);
+        refresh();
+    });
+
+    el.nextBtn.addEventListener('click', () => {
+        const l = state.limit > 0 ? state.limit : state.lastCount || 0;
+        // Only move next if previous fetch filled the page (heuristic)
+        if (state.lastCount >= l && l > 0) {
+            state.offset = state.offset + l;
+            refresh();
+        }
+    });
+
+    el.createForm.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+        const form = ev.currentTarget;
+        const item = {
+            name: form.name.value.trim(),
+            URL: form.url.value.trim(),
+            description: form.description.value,
+        };
+        if (!item.name || !item.URL) {
+            alert('Name and URL are required');
+            return;
+        }
+        try {
+            const res = await api.create(item);
+            if (!res.ok) throw new Error(`Create failed (${res.status})`);
+            form.reset();
+            // After creating, jump to the beginning to see the newest items (IDs ascending)
+            state.offset = 0;
+            await refresh();
+        } catch (e) {
+            alert('Create failed: ' + e.message);
+        }
+    });
+
+    // Initial load
+    refresh();
+</script>
+</body>
+</html>
