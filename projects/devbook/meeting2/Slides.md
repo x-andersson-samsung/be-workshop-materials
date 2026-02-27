@@ -41,7 +41,6 @@ code {
 - Introduce REST API concepts
 - Add http server to our app
 - Basic resource operations (CRUD)
-- Go templates
 </grid>
 
 ---
