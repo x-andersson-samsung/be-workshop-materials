@@ -1,6 +1,6 @@
 package exercise5
 
-func FilterEven(arr []int) []int {
+func Solution_FilterEven(arr []int) []int {
 	var out []int
 	for _, v := range arr {
 		if v%2 == 0 {

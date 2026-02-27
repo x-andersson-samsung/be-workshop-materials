@@ -1,6 +1,6 @@
 package exercise3
 
-func ArrStats(array []int) (int, int, float64) {
+func Solution_ArrStats(array []int) (int, int, float64) {
 	if len(array) == 0 {
 		return 0, 0, 0
 	}

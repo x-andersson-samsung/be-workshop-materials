@@ -1,6 +1,6 @@
 package exercise2
 
-func AtoI(s string) int {
+func Solution_AtoI(s string) int {
 	isNegative := false
 	if s[0] == '-' {
 		isNegative = true
