@@ -1,11 +1,18 @@
 package exercise2
 
-//Write 2 handlers. Each will receive 2 query parameters a and b.
+//Write a handler processing body parameters.
+//- AddHandler - returning sum of all values.
 
-//AddHandler - returning sum of a & b
-//SubHandler - returning difference of a & b
-//You can assume input will be correct and skip error checking.
+//Parameters will be provided in JSON body:
+//```json
+//{
+//	"values": [1,2,3,4]
+//}
+//```
 
-//Hint:
-//strconv.Atoi & strconv.ItoA will help convert types
-//You can cast string to []byte to use in w.Write
+//Expected response format:
+//```json
+//{
+//	"result": 10
+//}
+//```

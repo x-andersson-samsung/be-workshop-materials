@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func AddHandler(w http.ResponseWriter, r *http.Request) {
+func Solution_AddHandler(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseForm()
 
 	aStr, bStr := r.Form.Get("a"), r.Form.Get("b")
@@ -15,7 +15,7 @@ func AddHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(strconv.Itoa(a + b)))
 }
 
-func SubHandler(w http.ResponseWriter, r *http.Request) {
+func Solution_SubHandler(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseForm()
 
 	aStr, bStr := r.Form.Get("a"), r.Form.Get("b")

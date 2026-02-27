@@ -3,7 +3,7 @@ title: "Devbook "
 level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-02-26 17-08-52
+modified_at: 2026-02-27 07-13-05
 slideNumber: "true"
 ---
 
@@ -685,9 +685,9 @@ Hint:
 </grid>
 
 <grid drag="100 85" drop="0 10" align="left" justify-content="center">
-Write a small adder 
+Write a handler processing body parameters.
 
-- **_GET /add_**
+- AddHandler - returning sum of all values.
 
 Parameters will be provided in JSON body:
 ```json
