@@ -164,13 +164,13 @@
             return res
         },
         removeById: async (id) => {
-            const res = fetch(`/items/${encodeURIComponent(id)}`, {method: 'DELETE'});
+            const res = await fetch(`/items/${encodeURIComponent(id)}`, {method: 'DELETE'});
             if (!res.ok) throw new Error(`Delete failed (${res.status})\n${await res.text()}`);
 
             return res;
         },
-        edit: async (id, item) => {
-            const res = await fetch(`/items/${encodeURIComponent(id)}`, {
+        edit: async (item) => {
+            const res = await fetch(`/items/${encodeURIComponent(item.id)}`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(item)

@@ -1,23 +1,18 @@
 package main
 
 import (
-	"devbook_meeting2/code/pkg/api"
-	"devbook_meeting2/code/pkg/devbook"
-	"devbook_meeting2/code/pkg/tui"
 	_ "embed"
 	"fmt"
 	"net/http"
-	"os"
+
+	"devbook_meeting2/code/pkg/api"
+	"devbook_meeting2/code/pkg/devbook"
 )
 
 const ServerAddress = ":8080"
 
 //go:embed static/index.html
 var indexData []byte
-
-func readIndexFile(path string) ([]byte, error) {
-	return os.ReadFile(path)
-}
 
 func setupAndRunServer(store *devbook.Store, indexData []byte) error {
 	mux := http.NewServeMux()
@@ -31,10 +26,6 @@ func setupAndRunServer(store *devbook.Store, indexData []byte) error {
 
 	fmt.Println("Starting server on " + ServerAddress)
 	return http.ListenAndServe(ServerAddress, mux)
-}
-
-func setupAndRunTUI(store *devbook.Store) error {
-	return tui.MenuView(store)
 }
 
 func main() {

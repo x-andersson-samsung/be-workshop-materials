@@ -3,7 +3,7 @@ title: "Devbook "
 level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-02-27 07-13-05
+modified_at: 2026-03-02 09-42-18
 slideNumber: "true"
 ---
 
@@ -923,6 +923,22 @@ func (i *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
 --
 
 <grid drag="100 10" drop="0 0" align="left" >
+### Http Handler - Update
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go []
+func (i *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {  
+    http.Error(w, "Not implemented", http.StatusNotImplemented)  
+}
+```
+
+Part of the homework :).
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
 ### Adapting main - getting index.html
 </grid>
 
@@ -964,6 +980,55 @@ func setupAndRunServer(store *devbook.Store, indexData []byte) error {
 ```
 </grid>
 
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Adapting main - full
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go[]
+  
+const ServerAddress = ":8080"  
+
+//go:embed static/index.html  
+var indexData []byte  
+  
+func setupAndRunServer(store *devbook.Store, indexData []byte) error {  
+    mux := http.NewServeMux()  
+  
+    mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {  
+       w.Write(indexData)  
+    })  
+  
+    itemHandler := api.ItemHandler{Store: store}  
+    itemHandler.Register(mux)  
+  
+    fmt.Println("Starting server on " + ServerAddress)  
+    return http.ListenAndServe(ServerAddress, mux)  
+}  
+  
+func main() {  
+    // Setup starting data  
+    store := devbook.NewStore()  
+    store.Add(devbook.Item{  
+       Name:        "item1",  
+       Description: "search engine",  
+       URL:         "https://google.pl",  
+    })  
+    store.Add(devbook.Item{  
+       Name:        "item2",  
+       Description: "other search engine",  
+       URL:         "https://bing.com",  
+    })  
+  
+    if err := setupAndRunServer(store, indexData); err != nil {  
+       panic(err)  
+    }  
+}
+```
+</grid>
+
 ---
 
 # Homework
@@ -978,6 +1043,7 @@ func setupAndRunServer(store *devbook.Store, indexData []byte) error {
 - Add support for editing items on **_"PUT /items/{id}"_**
 - Add pagination support to **_List_**
 	- Hint: FE is sending **_offset_** and **_limit_** query values
+- Change ItemHandler Store into an interface 
 - (optional) Add URL validation to **_Create_** and **_Update_**
     - Should return different error to FE
     - For validation see: [url.Parse](https://pkg.go.dev/net/url#Parse)
@@ -985,3 +1051,167 @@ func setupAndRunServer(store *devbook.Store, indexData []byte) error {
 </grid>
 
 ---
+
+# Addendum
+
+---
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Parallel issue
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Let's take a look at our store Add function.
+```go[]
+type Store struct {  
+    nextID int  
+    data   map[int]Item  
+}  
+  
+func NewStore() *Store {  
+    return &Store{  
+       nextID: 1,  
+       data:   make(map[int]Item),  
+    }  
+}
+
+func (store *Store) Add(item Item) {  
+    item.ID = store.nextID  
+    store.nextID++  
+  
+    store.data[item.ID] = item  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Parallel issue
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+If 2 users call Add at the same time there is a chance that only one of their changes will be stored.
+
+We need to protect our store from multiple parallel access.
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Parallel issue
+</grid>
+
+<grid drag="100 85" drop="0 15" align="left" justify-content="center">
+```mermaid
+sequenceDiagram  
+    participant T1 as Thread 1  
+    participant S as Store  
+    participant T2 as Thread 2  
+  
+    Note over T1,T2: nextID = 1 
+  
+    T1->>S: Add(item1)  
+    T2->>S: Add(item2)  
+      
+    Note over T1: nextID = 1  
+    Note over T2: nextID = 1  
+      
+    T1->>S: nextID++  
+    T2->>S: nextID++  
+      
+    T1->>S: data[1] = item1  
+    T2->>S: data[1] = item2  
+      
+    Note over S: Both items get ID=1 - item1 overwritten!
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### [**_sync_**](https://pkg.go.dev/sync) package
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+Provides basic synchronization primitives and helper functions for low-level synchronization.
+
+For higher-level it's better to use channels.
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### [**_sync_**](https://pkg.go.dev/sync) package - Mutex
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+**_sync.Mutex_**
+```go []
+var mtx sync.Mutex
+
+// Will only allow single routine to enter.
+// Others will wait on this line until Unlock is called.
+mtx.Lock()
+
+// Critical section
+
+mtx.Unlock()
+
+```
+Good for only allowing one routine into the critical section at a time.
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Fixing Add function - struct
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go[]
+type Store struct {  
+    nextID int  
+    data   map[int]Item
+	mtx sync.Mutex 
+}  
+  
+func NewStore() *Store {  
+    return &Store{  
+       nextID: 1,  
+       data:   make(map[int]Item), 
+       mtx: sync.Mutex{},
+    }  
+}
+```
+</grid>
+
+--
+
+<grid drag="100 10" drop="0 0" align="left" >
+### Fixing Add function - Add
+</grid>
+
+<grid drag="100 85" drop="0 10" align="left" justify-content="center">
+```go[]
+func (store *Store) Add(item Item) {  
+	// Lock access to section below
+	store.mtx.Lock()
+
+	// Automatically release the section once we exit function
+	defer store.mtx.Unlock()
+
+	// Critical section start
+    item.ID = store.nextID  
+    store.nextID++  
+  
+    store.data[item.ID] = item  
+    // Critical section end
+}
+```
+
+We should do similar protection in other functions.
+</grid>
+
+--
+
