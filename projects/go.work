@@ -3,4 +3,5 @@ go 1.25
 use (
 	devbook/meeting1
 	devbook/meeting2
+	devbook/meeting5
 )
