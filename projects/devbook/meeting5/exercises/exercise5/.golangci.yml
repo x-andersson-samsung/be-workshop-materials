@@ -1,0 +1,608 @@
+version: "2"
+linters:
+  default: none
+  enable:
+    - errcheck
+    - gocritic
+    - gosec
+    - govet
+    - revive
+    - sloglint
+    - staticcheck
+    - tagliatelle
+    - unparam
+    - wastedassign
+
+  settings:
+    errcheck:
+      # Report about not checking of errors in type assertions: `a := b.(MyStruct)`.
+      # Such cases aren't reported by default.
+      check-type-assertions: true
+      # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`.
+      # Such cases aren't reported by default.
+      check-blank: true
+      # To disable the errcheck built-in exclude list.
+      # See `-excludeonly` option in https://github.com/kisielk/errcheck#excluding-functions for details.
+      disable-default-exclusions: true
+      # List of functions to exclude from checking, where each entry is a single function to exclude.
+      # See https://github.com/kisielk/errcheck#excluding-functions for details.
+      exclude-functions:
+        - io/ioutil.ReadFile
+        - io.Copy(*bytes.Buffer)
+        - io.Copy(os.Stdout)
+      # Display function signature instead of selector.
+      verbose: true
+
+    gocritic:
+      # Disable all checks.
+      # Default: false
+      disable-all: true
+      # Which checks should be enabled in addition to default checks; can't be combined with 'disabled-checks'.
+      enabled-checks:
+        # Detects suspicious append result assignments.
+        # https://go-critic.com/overview.html#appendassign
+        - appendAssign
+        # Detects `append` chains to the same slice that can be done in a single `append` call.
+        # https://go-critic.com/overview.html#appendcombine
+        - appendCombine
+        # Detects suspicious arguments order.
+        # https://go-critic.com/overview.html#argorder
+        - argOrder
+        # Detects assignments that can be simplified by using assignment operators.
+        # https://go-critic.com/overview.html#assignop
+        - assignOp
+        # Detects suspicious function calls.
+        # https://go-critic.com/overview.html#badcall
+        - badCall
+        # Detects suspicious condition expressions.
+        # https://go-critic.com/overview.html#badcond
+        - badCond
+        # Detects suspicious mutex lock/unlock operations.
+        # https://go-critic.com/overview.html#badlock
+        - badLock
+        # Detects suspicious regexp patterns.
+        # https://go-critic.com/overview.html#badregexp
+        - badRegexp
+        # Detects bad usage of sort package.
+        # https://go-critic.com/overview.html#badsorting
+        - badSorting
+        # Detects bad usage of sync.OnceFunc.
+        # https://go-critic.com/overview.html#badsynconcefunc
+        - badSyncOnceFunc
+        # Detects bool expressions that can be simplified.
+        # https://go-critic.com/overview.html#boolexprsimplify
+        - boolExprSimplify
+        # Detects when predeclared identifiers are shadowed in assignments.
+        # https://go-critic.com/overview.html#builtinshadow
+        - builtinShadow
+        # Detects top-level declarations that shadow the predeclared identifiers.
+        # https://go-critic.com/overview.html#builtinshadowdecl
+        - builtinShadowDecl
+        # Detects capitalized names for local variables.
+        # https://go-critic.com/overview.html#captlocal
+        - captLocal
+        # Detects erroneous case order inside switch statements.
+        # https://go-critic.com/overview.html#caseorder
+        - caseOrder
+        # Detects malformed 'code generated' file comments.
+        # https://go-critic.com/overview.html#codegencomment
+        - codegenComment
+        # Detects comments with non-idiomatic formatting.
+        # https://go-critic.com/overview.html#commentformatting
+        - commentFormatting
+        # Detects commented-out code inside function bodies.
+        # https://go-critic.com/overview.html#commentedoutcode
+        - commentedOutCode
+        # Detects commented-out imports.
+        # https://go-critic.com/overview.html#commentedoutimport
+        - commentedOutImport
+        # Detects when default case in switch isn't on 1st or last position.
+        # https://go-critic.com/overview.html#defaultcaseorder
+        - defaultCaseOrder
+        # Detects loops inside functions that use defer.
+        # https://go-critic.com/overview.html#deferinloop
+        - deferInLoop
+        # Detects deferred function literals that can be simplified.
+        # https://go-critic.com/overview.html#deferunlambda
+        - deferUnlambda
+        # Detects malformed 'deprecated' doc-comments.
+        # https://go-critic.com/overview.html#deprecatedcomment
+        - deprecatedComment
+        # Detects comments that silence go lint complaints about doc-comment.
+        # https://go-critic.com/overview.html#docstub
+        - docStub
+        # Detects suspicious duplicated arguments.
+        # https://go-critic.com/overview.html#duparg
+        - dupArg
+        # Detects duplicated branch bodies inside conditional statements.
+        # https://go-critic.com/overview.html#dupbranchbody
+        - dupBranchBody
+        # Detects duplicated case clauses inside switch or select statements.
+        # https://go-critic.com/overview.html#dupcase
+        - dupCase
+        # Detects multiple imports of the same package under different aliases.
+        # https://go-critic.com/overview.html#dupimport
+        - dupImport
+        # Detects duplicated option function arguments in variadic function calls.
+        # https://go-critic.com/overview.html#dupoption
+        - dupOption
+        # Detects suspicious duplicated sub-expressions.
+        # https://go-critic.com/overview.html#dupsubexpr
+        - dupSubExpr
+        # Detects suspicious formatting strings usage.
+        # https://go-critic.com/overview.html#dynamicfmtstring
+        - dynamicFmtString
+        # Detects else with nested if statement that can be replaced with else-if.
+        # https://go-critic.com/overview.html#elseif
+        - elseif
+        # Detects suspicious empty declarations blocks.
+        # https://go-critic.com/overview.html#emptydecl
+        - emptyDecl
+        # Detects fallthrough that can be avoided by using multi case values.
+        # https://go-critic.com/overview.html#emptyfallthrough
+        - emptyFallthrough
+        # Detects empty string checks that can be written more idiomatically.
+        # https://go-critic.com/overview.html#emptystringtest
+        - emptyStringTest
+        # Detects unoptimal strings/bytes case-insensitive comparison.
+        # https://go-critic.com/overview.html#equalfold
+        - equalFold
+        # Detects unwanted dependencies on the evaluation order.
+        # https://go-critic.com/overview.html#evalorder
+        - evalOrder
+        # Detects calls to exit/fatal inside functions that use defer.
+        # https://go-critic.com/overview.html#exitafterdefer
+        - exitAfterDefer
+        # Detects suspicious reassignment of error from another package.
+        # https://go-critic.com/overview.html#externalerrorreassign
+        - externalErrorReassign
+        # Detects problems in filepath.Join() function calls.
+        # https://go-critic.com/overview.html#filepathjoin
+        - filepathJoin
+        # Detects immediate dereferencing of `flag` package pointers.
+        # https://go-critic.com/overview.html#flagderef
+        - flagDeref
+        # Detects suspicious flag names.
+        # https://go-critic.com/overview.html#flagname
+        - flagName
+        # Detects hex literals that have mixed case letter digits.
+        # https://go-critic.com/overview.html#hexliteral
+        - hexLiteral
+        # Detects nil usages in http.NewRequest calls, suggesting http.NoBody as an alternative.
+        # https://go-critic.com/overview.html#httpnobody
+        - httpNoBody
+        # Detects params that incur excessive amount of copying.
+        # https://go-critic.com/overview.html#hugeparam
+        - hugeParam
+        # Detects repeated if-else statements and suggests to replace them with switch statement.
+        # https://go-critic.com/overview.html#ifelsechain
+        - ifElseChain
+        # Detects when imported package names shadowed in the assignments.
+        # https://go-critic.com/overview.html#importshadow
+        - importShadow
+        # Detects strings.Index calls that may cause unwanted allocs.
+        # https://go-critic.com/overview.html#indexalloc
+        - indexAlloc
+        # Detects non-assignment statements inside if/switch init clause.
+        # https://go-critic.com/overview.html#initclause
+        - initClause
+        # Detects suspicious map literal keys.
+        # https://go-critic.com/overview.html#mapkey
+        - mapKey
+        # Detects method expression call that can be replaced with a method call.
+        # https://go-critic.com/overview.html#methodexprcall
+        - methodExprCall
+        # Finds where nesting level could be reduced.
+        # https://go-critic.com/overview.html#nestingreduce
+        - nestingReduce
+        # Detects immediate dereferencing of `new` expressions.
+        # https://go-critic.com/overview.html#newderef
+        - newDeref
+        # Detects return statements those results evaluate to nil.
+        # https://go-critic.com/overview.html#nilvalreturn
+        - nilValReturn
+        # Detects old-style octal literals.
+        # https://go-critic.com/overview.html#octalliteral
+        - octalLiteral
+        # Detects various off-by-one kind of errors.
+        # https://go-critic.com/overview.html#offby1
+        - offBy1
+        # Detects if function parameters could be combined by type and suggest the way to do it.
+        # https://go-critic.com/overview.html#paramtypecombine
+        - paramTypeCombine
+        # Detects expressions like []rune(s)[0] that may cause unwanted rune slice allocation.
+        # https://go-critic.com/overview.html#preferdecoderune
+        - preferDecodeRune
+        # Detects concatenation with os.PathSeparator which can be replaced with filepath.Join.
+        # https://go-critic.com/overview.html#preferfilepathjoin
+        - preferFilepathJoin
+        # Detects fmt.Sprint(f/ln) calls which can be replaced with fmt.Fprint(f/ln).
+        # https://go-critic.com/overview.html#preferfprint
+        - preferFprint
+        # Detects w.Write or io.WriteString calls which can be replaced with w.WriteString.
+        # https://go-critic.com/overview.html#preferstringwriter
+        - preferStringWriter
+        # Detects WriteRune calls with rune literal argument that is single byte and reports to use WriteByte instead.
+        # https://go-critic.com/overview.html#preferwritebyte
+        - preferWriteByte
+        # Detects input and output parameters that have a type of pointer to referential type.
+        # https://go-critic.com/overview.html#ptrtorefparam
+        - ptrToRefParam
+        # Detects append all its data while range it.
+        # https://go-critic.com/overview.html#rangeappendall
+        - rangeAppendAll
+        # Detects expensive copies of `for` loop range expressions.
+        # https://go-critic.com/overview.html#rangeexprcopy
+        - rangeExprCopy
+        # Detects loops that copy big objects during each iteration.
+        # https://go-critic.com/overview.html#rangevalcopy
+        - rangeValCopy
+        # Detects redundant fmt.Sprint calls.
+        # https://go-critic.com/overview.html#redundantsprint
+        - redundantSprint
+        # Detects `regexp.Compile*` that can be replaced with `regexp.MustCompile*`.
+        # https://go-critic.com/overview.html#regexpmust
+        - regexpMust
+        # Detects suspicious regexp patterns.
+        # https://go-critic.com/overview.html#regexppattern
+        - regexpPattern
+        # Detects regexp patterns that can be simplified.
+        # https://go-critic.com/overview.html#regexpsimplify
+        - regexpSimplify
+        # Detects suspicious http.Error call without following return.
+        # https://go-critic.com/overview.html#returnafterhttperror
+        - returnAfterHttpError
+        # Runs user-defined rules using ruleguard linter.
+        # https://go-critic.com/overview.html#ruleguard
+        - ruleguard
+        # Detects switch statements that could be better written as if statement.
+        # https://go-critic.com/overview.html#singlecaseswitch
+        - singleCaseSwitch
+        # Detects slice clear loops, suggests an idiom that is recognized by the Go compiler.
+        # https://go-critic.com/overview.html#sliceclear
+        - sliceClear
+        # Detects usage of `len` when result is obvious or doesn't make sense.
+        # https://go-critic.com/overview.html#sloppylen
+        - sloppyLen
+        # Detects suspicious/confusing re-assignments.
+        # https://go-critic.com/overview.html#sloppyreassign
+        - sloppyReassign
+        # Detects redundant type assertions.
+        # https://go-critic.com/overview.html#sloppytypeassert
+        - sloppyTypeAssert
+        # Detects suspicious sort.Slice calls.
+        # https://go-critic.com/overview.html#sortslice
+        - sortSlice
+        # Detects "%s" formatting directives that can be replaced with %q.
+        # https://go-critic.com/overview.html#sprintfquotedstring
+        - sprintfQuotedString
+        # Detects issue in Query() and Exec() calls.
+        # https://go-critic.com/overview.html#sqlquery
+        - sqlQuery
+        # Detects string concat operations that can be simplified.
+        # https://go-critic.com/overview.html#stringconcatsimplify
+        - stringConcatSimplify
+        # Detects redundant conversions between string and []byte.
+        # https://go-critic.com/overview.html#stringxbytes
+        - stringXbytes
+        # Detects strings.Compare usage.
+        # https://go-critic.com/overview.html#stringscompare
+        - stringsCompare
+        # Detects switch-over-bool statements that use explicit `true` tag value.
+        # https://go-critic.com/overview.html#switchtrue
+        - switchTrue
+        # Detects sync.Map load+delete operations that can be replaced with LoadAndDelete.
+        # https://go-critic.com/overview.html#syncmaploadanddelete
+        - syncMapLoadAndDelete
+        # Detects manual conversion to milli- or microseconds.
+        # https://go-critic.com/overview.html#timeexprsimplify
+        - timeExprSimplify
+        # Detects TODO comments without detail/assignee.
+        # https://go-critic.com/overview.html#todocommentwithoutdetail
+        - todoCommentWithoutDetail
+        # Detects function with too many results.
+        # https://go-critic.com/overview.html#toomanyresultschecker
+        - tooManyResultsChecker
+        # Detects potential truncation issues when comparing ints of different sizes.
+        # https://go-critic.com/overview.html#truncatecmp
+        - truncateCmp
+        # Detects repeated type assertions and suggests to replace them with type switch statement.
+        # https://go-critic.com/overview.html#typeassertchain
+        - typeAssertChain
+        # Detects method declarations preceding the type definition itself.
+        # https://go-critic.com/overview.html#typedeffirst
+        - typeDefFirst
+        # Detects type switches that can benefit from type guard clause with variable.
+        # https://go-critic.com/overview.html#typeswitchvar
+        - typeSwitchVar
+        # Detects unneeded parenthesis inside type expressions and suggests to remove them.
+        # https://go-critic.com/overview.html#typeunparen
+        - typeUnparen
+        # Detects unchecked errors in if statements.
+        # https://go-critic.com/overview.html#uncheckedinlineerr
+        - uncheckedInlineErr
+        # Detects dereference expressions that can be omitted.
+        # https://go-critic.com/overview.html#underef
+        - underef
+        # Detects redundant statement labels.
+        # https://go-critic.com/overview.html#unlabelstmt
+        - unlabelStmt
+        # Detects function literals that can be simplified.
+        # https://go-critic.com/overview.html#unlambda
+        - unlambda
+        # Detects unnamed results that may benefit from names.
+        # https://go-critic.com/overview.html#unnamedresult
+        - unnamedResult
+        # Detects unnecessary braced statement blocks.
+        # https://go-critic.com/overview.html#unnecessaryblock
+        - unnecessaryBlock
+        # Detects redundantly deferred calls.
+        # https://go-critic.com/overview.html#unnecessarydefer
+        - unnecessaryDefer
+        # Detects slice expressions that can be simplified to sliced expression itself.
+        # https://go-critic.com/overview.html#unslice
+        - unslice
+        # Detects value swapping code that are not using parallel assignment.
+        # https://go-critic.com/overview.html#valswap
+        - valSwap
+        # Detects conditions that are unsafe due to not being exhaustive.
+        # https://go-critic.com/overview.html#weakcond
+        - weakCond
+        # Ensures that `//nolint` comments include an explanation.
+        # https://go-critic.com/overview.html#whynolint
+        - whyNoLint
+        # Detects function calls that can be replaced with convenience wrappers.
+        # https://go-critic.com/overview.html#wrapperfunc
+        - wrapperFunc
+        # Detects Yoda style expressions and suggests to replace them.
+        # https://go-critic.com/overview.html#yodastyleexpr
+        - yodaStyleExpr
+        # Detects bytes.Repeat with 0 value.
+        # https://go-critic.com/overview.html#zerobyterepeat
+        - zeroByteRepeat
+
+    govet:
+      # Disable all analyzers.
+      disable-all: true
+      # Enable analyzers by name.
+      enable:
+        # Check for missing values after append.
+        - appends
+        # Report mismatches between assembly files and Go declarations.
+        - asmdecl
+        # Check for useless assignments.
+        - assign
+        # Check for common mistakes using the sync/atomic package.
+        - atomic
+        # Check for non-64-bits-aligned arguments to sync/atomic functions.
+        - atomicalign
+        # Check for common mistakes involving boolean operators.
+        - bools
+        # Check //go:build and // +build directives.
+        - buildtag
+        # Detect some violations of the cgo pointer passing rules.
+        - cgocall
+        # Check for unkeyed composite literals.
+        - composites
+        # Check for locks erroneously passed by value.
+        - copylocks
+        # Check for calls of reflect.DeepEqual on error values.
+        - deepequalerrors
+        # Report common mistakes in defer statements.
+        - defers
+        # Check Go toolchain directives such as //go:debug.
+        - directive
+        # Report passing non-pointer or non-error values to errors.As.
+        - errorsas
+        # Find calls to a particular function.
+        - findcall
+        # Report assembly that clobbers the frame pointer before saving it.
+        - framepointer
+        # Check format of addresses passed to net.Dial.
+        - hostport
+        # Report using Go 1.22 enhanced ServeMux patterns in older Go versions.
+        - httpmux
+        # Check for mistakes using HTTP responses.
+        - httpresponse
+        # Detect impossible interface-to-interface type assertions.
+        - ifaceassert
+        # Check references to loop variables from within nested functions.
+        - loopclosure
+        # Check cancel func returned by context.WithCancel is called.
+        - lostcancel
+        # Check for useless comparisons between functions and nil.
+        - nilfunc
+        # Check for redundant or impossible nil comparisons.
+        - nilness
+        # Check consistency of Printf format strings and arguments.
+        - printf
+        # Check for comparing reflect.Value values with == or reflect.DeepEqual.
+        - reflectvaluecompare
+        # Check for possible unintended shadowing of variables.
+        - shadow
+        # Check for shifts that equal or exceed the width of the integer.
+        - shift
+        # Check for unbuffered channel of os.Signal.
+        - sigchanyzer
+        # Check for invalid structured logging calls.
+        - slog
+        # Check the argument type of sort.Slice.
+        - sortslice
+        # Check signature of methods of well-known interfaces.
+        - stdmethods
+        # Report uses of too-new standard library symbols.
+        - stdversion
+        # Check for string(int) conversions.
+        - stringintconv
+        # Check that struct field tags conform to reflect.StructTag.Get.
+        - structtag
+        # Report calls to (*testing.T).Fatal from goroutines started by a test.
+        - testinggoroutine
+        # Check for common mistaken usages of tests and examples.
+        - tests
+        # Check for calls of (time.Time).Format or time.Parse with 2006-02-01.
+        - timeformat
+        # Report passing non-pointer or non-interface values to unmarshal.
+        - unmarshal
+        # Check for unreachable code.
+        - unreachable
+        # Check for invalid conversions of uintptr to unsafe.Pointer.
+        - unsafeptr
+        # Check for unused results of calls to some functions.
+        - unusedresult
+        # Checks for unused writes.
+        - unusedwrite
+        # Check for misuses of sync.WaitGroup.
+        - waitgroup
+
+      disable:
+        # Find structs that would use less memory if their fields were sorted.
+        - fieldalignment
+
+    modernize:
+      # List of analyzers to disable.
+      # By default, all analyzers are enabled.
+      disable: [ ]
+
+    sloglint:
+      # Enforce not mixing key-value pairs and attributes.
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#no-mixed-arguments
+      no-mixed-args: false
+      # Enforce using key-value pairs only (overrides no-mixed-args, incompatible with attr-only).
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#key-value-pairs-only
+      kv-only: false
+      # Enforce using attributes only (overrides no-mixed-args, incompatible with kv-only).
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#attributes-only
+      attr-only: true
+      # Enforce not using global loggers.
+      # Values:
+      # - "": disabled
+      # - "all": report all global loggers
+      # - "default": report only the default slog logger
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#no-global
+      no-global: "all"
+      # Enforce using methods that accept a context.
+      # Values:
+      # - "": disabled
+      # - "all": report all contextless calls
+      # - "scope": report only if a context exists in the scope of the outermost function
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#context-only
+      context: "scope"
+      # Enforce using static values for log messages.
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#static-messages
+      static-msg: false
+      # Enforce message style.
+      # Values: lowercased, capitalized
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#message-style
+      # Default: ""
+      msg-style: lowercased
+      # Enforce using constants instead of raw keys.
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#no-raw-keys
+      # Default: false
+      no-raw-keys: true
+      # Enforce key naming convention.
+      # Values: snake, kebab, camel, pascal
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#key-naming-convention
+      # Default: ""
+      key-naming-case: snake
+      # Enforce not using specific keys.
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#forbidden-keys
+      # Default: []
+      forbidden-keys:
+        - time
+        - level
+        - msg
+        - source
+      # Enforce putting arguments on separate lines.
+      # https://github.com/go-simpler/sloglint?tab=readme-ov-file#arguments-on-separate-lines
+      # Default: false
+      args-on-sep-lines: true
+
+    tagliatelle:
+      # Checks the struct tag name case.
+      case:
+        # Defines the association between tag name and case.
+        # Any struct tag name can be used.
+        # Supported string cases:
+        #`camel`, `pascal`, `kebab`, `snake`, `upperSnake`, `goCamel`, `goPascal`
+        #`goKebab`, `goSnake`, `upper`, `lower`, `header`
+        rules:
+          json: camel
+          yaml: camel
+          xml: camel
+          toml: camel
+          bson: camel
+          avro: snake
+          mapstructure: kebab
+          env: upperSnake
+          envconfig: upperSnake
+          whatever: snake
+        # Uses the struct field name to check the name of the struct tag.
+        use-field-name: false
+        # The field names to ignore.
+
+formatters:
+  # Enable specific formatter.
+  # Default: [] (uses standard Go formatting)
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  # Formatters settings.
+  settings:
+    # See the dedicated "formatters.settings" documentation section.
+    gofmt:
+      # Simplify code: gofmt with `-s` option.
+      simplify: true
+      # Apply the rewrite rules to the source before reformatting.
+      # https://pkg.go.dev/cmd/gofmt
+      rewrite-rules:
+        - pattern: 'interface{}'
+          replacement: 'any'
+        - pattern: 'a[b:len(a)]'
+          replacement: 'a[b:]'
+
+    gofumpt:
+      # Choose whether to use the extra rules.
+      extra-rules: true
+
+    goimports:
+      # A list of prefixes, which, if set, checks import paths
+      # with the given prefixes are grouped after 3rd-party packages.
+      local-prefixes: [ ]
+
+issues:
+  # Maximum issues count per one linter.
+  # Set to 0 to disable.
+  # Default: 50
+  max-issues-per-linter: 0
+  # Maximum count of issues with the same text.
+  # Set to 0 to disable.
+  # Default: 3
+  max-same-issues: 0
+  # Make issues output unique by line.
+  # Default: true
+  uniq-by-line: true
+  # Show only new issues: if there are unstaged changes or untracked files,
+  # only those changes are analyzed, else only changes in HEAD~ are analyzed.
+  # It's a super-useful option for integration of golangci-lint into existing large codebase.
+  # It's not practical to fix all existing issues at the moment of integration:
+  # much better don't allow issues in new code.
+  #
+  # Default: false
+  new: false
+  # Show only new issues created after the best common ancestor (merge-base against HEAD).
+  # Default: ""
+  new-from-merge-base: ""
+  # Show only new issues created after git revision `REV`.
+  # Default: ""
+  new-from-rev: ""
+  # Show only new issues created in git patch with set file path.
+  # Default: ""
+  new-from-patch: ""
+  # Show issues in any part of update files (requires new-from-rev or new-from-patch).
+  # Default: false
+  whole-files: false
+  # Fix found issues (if it's supported by the linter).
+  # Default: false
+  fix: false

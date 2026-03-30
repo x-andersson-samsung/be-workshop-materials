@@ -3,7 +3,7 @@ title: "Devbook "
 level: basic
 tags: []
 created_at: 2026-01-26 07-12-12
-modified_at: 2026-03-29 16-18-04
+modified_at: 2026-03-30 07-54-34
 center:
 slideNumber: "true"
 ---
@@ -60,7 +60,7 @@ section > div {
 	text-align: left !important;
 }
 
-%% If it is a title slide %%
+/* If it is a title slide */
 section > div:has(h1) {
 	align-items: center !important;
 	justify-content: center !important;
@@ -78,7 +78,8 @@ section > div:has(h1) {
 ---
 ### Plan
 
-- Testing & Benchmarking code
+- Testing
+- Benchmarking
 - Go linters
 
 ---
@@ -102,11 +103,11 @@ func TestSomething(t *testing.T) {}
 ### go test
 
 ```
-go test -v              // runs tests in verbose mode
-go test ./...           // runs all tests in the current directory and all subdirectories
-go test ./module/...    // runs all tests in `module` and its subdirectories
-go test -run Add        // runs all tests that contain the string `Add` in their name
-go test -count=1        // disable test caching
+go test -v            // runs tests in verbose mode
+go test ./...         // runs all tests in the current directory and all subdirectories
+go test ./module/...  // runs all tests in `module` and its subdirectories
+go test -run Add      // runs all tests that contain the string `Add` in their name
+go test -count=1      // disable test caching
 ```
 
 --
@@ -135,9 +136,9 @@ func TestUserValidation(t *testing.T) {
 
 ### testing.T - logs
 
-**t.Log** - prints a message<br>
-**t.Error** - prints an error message and fails the test<br>
-**t.Fatal** - prints an error message and stops the test run<br>
+`t.Log` - prints a message<br>
+`t.Error` - prints an error message and fails the test<br>
+`t.Fatal` - prints an error message and stops the test run<br>
 
 Functions also have a ***f** variant that accepts format strings and arguments
 
@@ -159,11 +160,11 @@ func TestAdd(t *testing.T) {
 
 ### testing.T - flow control
 
-**t.Run** - runs a subtest<br>
-**t.Skip** - logs a message and then stops the test run<br>
-**t.SkipNow** - same, without a message<br>
-**t.Fail** - fails the test<br>
-**t.FailNow** - fails the test and stops the test run
+`t.Run` - runs a subtest<br>
+`t.Skip` - logs a message and then stops the test run<br>
+`t.SkipNow` - same, without a message<br>
+`t.Fail` - fails the test<br>
+`t.FailNow` - fails the test and stops the test run
 
 ```go
 func TestAdd(t *testing.T) {
@@ -356,7 +357,7 @@ func assertUserValid(t *testing.T, user User) {
     if user.Email == "" {
         t.Error("email is empty")
     }
-    if user.Age &lt; 18 {
+    if user.Age < 18 {
         t.Error("user is too young")
     }
 }
@@ -578,11 +579,8 @@ linters:
 --
 ### Exercise 5: Code quality
 
-1. Check implementation of `Add` function
-2. Implement `AddBetter` with a better implementation
-3. Write benchmarks for each of them and compare results
-
-
+1. Run `golangci-lint run` in exercise 5 folder.
+2. Check the issues.
 
 
 ---

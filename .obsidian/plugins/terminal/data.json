@@ -15,52 +15,6 @@
   "pinNewInstance": true,
   "preferredRenderer": "webgl",
   "profiles": {
-    "darwinExternalDefault": {
-      "args": [
-        "\"$PWD\""
-      ],
-      "executable": "/System/Applications/Utilities/Terminal.app/Contents/macOS/Terminal",
-      "followTheme": true,
-      "name": "",
-      "platforms": {
-        "darwin": true
-      },
-      "restoreHistory": false,
-      "rightClickAction": "copyPaste",
-      "successExitCodes": [
-        "0",
-        "SIGINT",
-        "SIGTERM"
-      ],
-      "terminalOptions": {
-        "documentOverride": null
-      },
-      "type": "external"
-    },
-    "darwinIntegratedDefault": {
-      "args": [
-        "--login"
-      ],
-      "executable": "/bin/zsh",
-      "followTheme": true,
-      "name": "",
-      "platforms": {
-        "darwin": true
-      },
-      "pythonExecutable": "python3",
-      "restoreHistory": false,
-      "rightClickAction": "copyPaste",
-      "successExitCodes": [
-        "0",
-        "SIGINT",
-        "SIGTERM"
-      ],
-      "terminalOptions": {
-        "documentOverride": null
-      },
-      "type": "integrated",
-      "useWin32Conhost": true
-    },
     "developerConsole": {
       "followTheme": true,
       "name": "",
@@ -118,33 +72,16 @@
       "type": "integrated",
       "useWin32Conhost": true
     },
-    "win32ExternalDefault": {
-      "args": [],
-      "executable": "C:\\Windows\\System32\\cmd.exe",
-      "followTheme": true,
-      "name": "",
-      "platforms": {
-        "win32": true
-      },
-      "restoreHistory": false,
-      "rightClickAction": "copyPaste",
-      "successExitCodes": [
-        "0",
-        "SIGINT",
-        "SIGTERM"
+    "87806423-0096-45f3-aee2-81675013963e": {
+      "args": [
+        "--login"
       ],
-      "terminalOptions": {
-        "documentOverride": null
-      },
-      "type": "external"
-    },
-    "win32IntegratedDefault": {
-      "args": [],
-      "executable": "C:\\Windows\\System32\\cmd.exe",
+      "executable": "/bin/zsh",
       "followTheme": true,
       "name": "",
       "platforms": {
-        "win32": true
+        "darwin": true,
+        "linux": true
       },
       "pythonExecutable": "python3",
       "restoreHistory": false,
@@ -161,8 +98,9 @@
       "useWin32Conhost": true
     }
   },
-  "defaultProfile": null,
+  "defaultProfile": "87806423-0096-45f3-aee2-81675013963e",
   "terminalOptions": {
-    "documentOverride": null
+    "documentOverride": null,
+    "fontFamily": "FiraCode Nerd Font Mono"
   }
 }
