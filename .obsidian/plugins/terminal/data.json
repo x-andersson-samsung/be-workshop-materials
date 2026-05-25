@@ -100,7 +100,7 @@
   },
   "defaultProfile": "87806423-0096-45f3-aee2-81675013963e",
   "terminalOptions": {
-    "documentOverride": null,
-    "fontFamily": "FiraCode Nerd Font Mono"
+    "fontFamily": "FiraCode Nerd Font Mono",
+    "documentOverride": null
   }
 }

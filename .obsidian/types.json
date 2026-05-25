@@ -25,6 +25,7 @@
     "TQ_show_tree": "checkbox",
     "TQ_show_urgency": "checkbox",
     "ptje": "multitext",
-    "level": "text"
+    "level": "text",
+    "TQ_show_toolbar": "checkbox"
   }
 }
